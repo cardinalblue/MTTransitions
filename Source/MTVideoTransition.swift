@@ -28,7 +28,10 @@ public enum MTVideoTransitionError: Error {
 }
 
 public class MTVideoTransition: NSObject {
-    
+
+    /// The video render size. It will use first asset's naturalSize if the value is not given
+    public var renderSize: CGSize?
+
     /// The duration of the transition.
     private var transitionDuration: CMTime = .invalid
     
@@ -108,7 +111,7 @@ public class MTVideoTransition: NSObject {
         transitionTimeRanges = Array(repeating: timeRange, count: clips.count)
         
         let videoTracks = self.clips[0].tracks(withMediaType: .video)
-        let videoSize = videoTracks[0].naturalSize
+        let videoSize = renderSize ?? videoTracks[0].naturalSize
         
         let composition = AVMutableComposition()
         composition.naturalSize = videoSize
