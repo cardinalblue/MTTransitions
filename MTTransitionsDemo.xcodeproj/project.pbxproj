@@ -45,6 +45,7 @@
 		A3E0AD2E2205BEA6002DD092 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A3E0AD252205BEA6002DD092 /* 2.jpg */; };
 		A3E0AD2F2205BEA6002DD092 /* 6.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A3E0AD262205BEA6002DD092 /* 6.jpg */; };
 		A3F2636A243EF67B00A093D2 /* PickImageTransitionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F26369243EF67B00A093D2 /* PickImageTransitionViewController.swift */; };
+		FBD7D02D2847486500E62822 /* APLCompositionDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +91,9 @@
 		A3F26369243EF67B00A093D2 /* PickImageTransitionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickImageTransitionViewController.swift; sourceTree = "<group>"; };
 		B836BB87FE171E542E923255 /* Pods-MTTransitionsDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MTTransitionsDemo.debug.xcconfig"; path = "Target Support Files/Pods-MTTransitionsDemo/Pods-MTTransitionsDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		DFFA7AD2345E40333C6D8F8D /* Pods-MTTransitionsDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MTTransitionsDemo.release.xcconfig"; path = "Target Support Files/Pods-MTTransitionsDemo/Pods-MTTransitionsDemo.release.xcconfig"; sourceTree = "<group>"; };
+		FBD7D02A2847486400E62822 /* MTTransitionsDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MTTransitionsDemo-Bridging-Header.h"; sourceTree = "<group>"; };
+		FBD7D02B2847486500E62822 /* APLCompositionDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLCompositionDebugView.h; sourceTree = "<group>"; };
+		FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLCompositionDebugView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,6 +199,9 @@
 				A3CFA848242B94A000F2E660 /* MultipleVideoTransitionsViewController.swift */,
 				A3913ED32428DE620083E7D3 /* TransitionsPickerViewController.swift */,
 				A3CFA846242B7A2300F2E660 /* CreateVideoFromImagesViewController.swift */,
+				FBD7D02B2847486500E62822 /* APLCompositionDebugView.h */,
+				FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */,
+				FBD7D02A2847486400E62822 /* MTTransitionsDemo-Bridging-Header.h */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -401,6 +408,7 @@
 				A32F8A6B22041F5D009C03AD /* GIFGenerator.swift in Sources */,
 				A3913EAA242761A30083E7D3 /* VideoTransitionSampleViewController.swift in Sources */,
 				A3913E95242648150083E7D3 /* WallpaperViewController.swift in Sources */,
+				FBD7D02D2847486500E62822 /* APLCompositionDebugView.m in Sources */,
 				A3913E872426277E0083E7D3 /* PushAViewController.swift in Sources */,
 				A3913ED42428DE620083E7D3 /* TransitionsPickerViewController.swift in Sources */,
 			);
@@ -559,6 +567,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.shuifeng.MTTransitionsDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTTransitionsDemo/Samples/MTTransitionsDemo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -579,6 +588,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.shuifeng.MTTransitionsDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTTransitionsDemo/Samples/MTTransitionsDemo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
