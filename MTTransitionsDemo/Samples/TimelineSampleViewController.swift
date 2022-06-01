@@ -1,9 +1,9 @@
 //
-//  VideoTransitionSampleViewController.swift
+//  TimelineSampleViewController.swift
 //  MTTransitionsDemo
 //
-//  Created by xushuifeng on 2020/3/22.
-//  Copyright © 2020 xu.shuifeng. All rights reserved.
+//  Created by Jim Wang on 2022/5/31.
+//  Copyright © 2022 xu.shuifeng. All rights reserved.
 //
 
 import UIKit
@@ -11,40 +11,62 @@ import AVFoundation
 import MTTransitions
 import Photos
 
-class VideoTransitionSampleViewController: UIViewController {
+class TimelineSampleViewController: UIViewController {
 
     private var videoView: UIView!
     private var nameLabel: UILabel!
     private var pickButton: UIButton!
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
+
+    private var composition: MTTimelineComposition?
+    private var timeline: Timeline?
+
     private let videoTransition = MTVideoTransition()
     private var clips: [AVAsset] = []
+
     private var exportButton: UIBarButtonItem!
-    
+
     private var result: MTVideoTransitionResult?
     private var exporter: MTVideoExporter?
-    
+
     private var effect = MTTransition.Effect.circleOpen
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
-        
+
         setupVideoPlaybacks()
         setupSubviews()
         setupNavigationBar()
-        makeTransition()
+        makeComposition()
+//        makeTransition()
+
+        setupDebugView()
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         playerLayer.frame = videoView.bounds
     }
-    
+
+    private let debugView = APLCompositionDebugView()
+
+    private func setupDebugView() {
+        debugView.player = player
+        debugView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(debugView)
+        NSLayoutConstraint.activate([
+            debugView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            debugView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            debugView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -80),
+            debugView.heightAnchor.constraint(equalToConstant: 300)
+        ])
+    }
+
     private func setupSubviews() {
         videoView = UIView()
         view.addSubview(videoView)
@@ -55,14 +77,14 @@ class VideoTransitionSampleViewController: UIViewController {
             videoView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -80),
             videoView.heightAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 720.0/1280.0)
         ])
-        
+
         let url = Bundle.main.url(forResource: "clip1", withExtension: "mp4")!
         player = AVPlayer(url: url)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer.videoGravity = .resizeAspect
         videoView.layer.addSublayer(playerLayer)
         videoView.backgroundColor = UIColor.green
-        
+
         nameLabel = UILabel()
         nameLabel.text = effect.description
         nameLabel.textAlignment = .center
@@ -73,17 +95,17 @@ class VideoTransitionSampleViewController: UIViewController {
             nameLabel.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             nameLabel.topAnchor.constraint(equalTo: videoView.bottomAnchor, constant: 15)
         ])
-        
+
         pickButton = UIButton(type: .system)
         pickButton.setTitle("Pick A Transition", for: .normal)
         view.addSubview(pickButton)
-        
+
         pickButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             pickButton.topAnchor.constraint(equalTo: self.nameLabel.bottomAnchor, constant: 30),
             pickButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
         ])
-        
+
         pickButton.addTarget(self, action: #selector(handlePickButtonClicked), for: .touchUpInside)
 
         setupSizeButtons()
@@ -91,16 +113,16 @@ class VideoTransitionSampleViewController: UIViewController {
 
     private func setupVideoPlaybacks() {
         guard let clip1 = loadVideoAsset(named: "clip1"),
-            let clip2 = loadVideoAsset(named: "clip2") else {
-            return
-        }
+              let clip2 = loadVideoAsset(named: "clip2") else {
+                  return
+              }
         clips = [clip1, clip2]
     }
 
     private func setupNavigationBar() {
         exportButton = UIBarButtonItem(title: "Export", style: .plain, target: self, action: #selector(handleExportButtonClicked))
         exportButton.isEnabled = false
-        
+
         navigationItem.rightBarButtonItem = exportButton
     }
 
@@ -148,7 +170,42 @@ class VideoTransitionSampleViewController: UIViewController {
             hStack.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
-    
+
+    private func makeComposition(renderSize: CGSize = CGSize(width: 720, height: 720)) {
+        let timeline = Timeline()
+        timeline.renderSize = renderSize
+        let resource1 = AVAssetResource(asset: loadVideoAsset(named: "clip1")!, selectedTimeRange: nil)
+        let resource2 = AVAssetResource(asset: loadVideoAsset(named: "clip2")!, selectedTimeRange: nil)
+        let resource3 = AVAssetResource(asset: loadVideoAsset(named: "clip3")!, selectedTimeRange: nil)
+        timeline.clips = [
+            Clip(resource: resource1),
+            Clip(resource: resource2),
+            Clip(resource: resource3)
+        ]
+        timeline.transitions = [
+            MTTransition.Effect.angular,
+            MTTransition.Effect.angular
+        ]
+
+        let composition = MTTimelineComposition(timeline: timeline)
+        do {
+            let playerItem = try composition.buildPlayerItem()
+            self.player.seek(to: .zero)
+            self.player.replaceCurrentItem(with: playerItem)
+            self.player.play()
+            self.registerNotifications()
+
+            self.debugView.synchronize(
+                to: playerItem.asset as? AVComposition,
+                videoComposition: playerItem.videoComposition,
+                audioMix: playerItem.audioMix
+            )
+        } catch {
+            debugPrint(error)
+        }
+        self.composition = composition
+    }
+
     private func makeTransition(renderSize: CGSize? = CGSize(width: 720, height: 720)) {
         videoTransition.renderSize = renderSize
 
@@ -157,18 +214,18 @@ class VideoTransitionSampleViewController: UIViewController {
             guard let self = self else { return }
             let playerItem = AVPlayerItem(asset: result.composition)
             playerItem.videoComposition = result.videoComposition
-            
+
             self.player.seek(to: .zero)
             self.player.replaceCurrentItem(with: playerItem)
             self.player.play()
-            
+
             self.registerNotifications()
-            
+
             self.result = result
             self.exportButton.isEnabled = true
         }
     }
-    
+
     private func registerNotifications() {
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self,
@@ -176,7 +233,7 @@ class VideoTransitionSampleViewController: UIViewController {
                                                name: .AVPlayerItemDidPlayToEndTime,
                                                object: player.currentItem)
     }
-    
+
     private func export(_ result: MTVideoTransitionResult) {
         exporter = try? MTVideoExporter(transitionResult: result)
         let fileURL = URL(fileURLWithPath: NSTemporaryDirectory().appending("exported.mp4"))
@@ -188,7 +245,7 @@ class VideoTransitionSampleViewController: UIViewController {
             }
         })
     }
-    
+
     private func saveVideo(fileURL: URL) {
         PHPhotoLibrary.requestAuthorization { status in
             switch status {
@@ -203,7 +260,7 @@ class VideoTransitionSampleViewController: UIViewController {
                         if success {
                             let alert = UIAlertController(title: "Video Saved To Camera Roll", message: nil, preferredStyle: .alert)
                             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { _ in
-                                
+
                             }))
                             self.present(alert, animated: true, completion: nil)
                         }
@@ -218,20 +275,20 @@ class VideoTransitionSampleViewController: UIViewController {
 }
 
 // MARK: - Events
-extension VideoTransitionSampleViewController {
-    
+extension TimelineSampleViewController {
+
     @objc private func handleExportButtonClicked() {
         guard let result = result else {
             return
         }
         self.export(result)
     }
-    
+
     @objc private func handlePlayToEndTime() {
         player.seek(to: .zero)
         player.play()
     }
-    
+
     @objc private func handlePickButtonClicked() {
         let pickerVC = TransitionsPickerViewController()
         pickerVC.selectionUpdated = { [weak self] effect in
@@ -269,8 +326,8 @@ extension VideoTransitionSampleViewController {
 }
 
 // MARK: - Helper
-extension VideoTransitionSampleViewController {
-    
+extension TimelineSampleViewController {
+
     private func loadVideoAsset(named: String, withExtension ext: String = "mp4") -> AVURLAsset? {
         guard let url = Bundle.main.url(forResource: named, withExtension: ext) else {
             return nil

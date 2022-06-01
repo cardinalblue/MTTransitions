@@ -48,4 +48,17 @@ extension UIImage {
         }
         self.init(cgImage: image)
     }
+
+    public convenience init(color: UIColor, size: CGSize) {
+        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+        let context = UIGraphicsGetCurrentContext()!
+
+        context.setFillColor(color.cgColor)
+        context.fill(CGRect(x: 0, y: 0, width: size.width, height: size.height))
+
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+
+        self.init(cgImage: image.cgImage!)
+    }
 }
