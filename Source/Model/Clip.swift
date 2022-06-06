@@ -8,14 +8,16 @@
 import AVFoundation
 import Foundation
 
-public protocol VideoCompositionTrackProvider: AnyObject {
-    func numberOfVideoTracks() -> Int
-    func videoCompositionTrack(at index: Int, for composition: AVMutableComposition, preferredTrackID: Int32, timeRange: CMTimeRange) -> AVCompositionTrack?
-}
+public protocol VideoCompositionProvider: AnyObject {
 
-public protocol AudioCompositionTrackProvider: AnyObject {
-    func numberOfAudioTracks() -> Int
-    func audioCompositionTrack(at index: Int, for composition: AVMutableComposition, preferredTrackID: Int32) -> AVCompositionTrack?
+    /// Apply effect to sourceImage
+    ///
+    /// - Parameters:
+    ///   - sourceImage: sourceImage is the original image from resource
+    ///   - time: time in timeline
+    ///   - renderSize: the video canvas size
+    /// - Returns: result image after apply effect
+    func applyEffect(to sourceImage: CIImage, at time: CMTime, renderSize: CGSize) -> CIImage
 }
 
 public class Clip {
@@ -23,11 +25,9 @@ public class Clip {
     public var identifier: String
     public var resource: Resource
 
-    //    public var videoConfiguration: VideoConfiguration = VideoConfiguration.createDefaultConfiguration()
-    //    public var audioConfiguration: AudioConfiguration = .createDefaultConfiguration()
-    //
-    //    public var videoTransition: VideoTransition?
-    //    public var audioTransition: AudioTransition?
+    public var videoPostProcessing: VideoProcessing? = BasicVideoConfiguration.createDefaultConfiguration()
+
+    //    public var audioConfiguration: AudioConfiguration = .createDefaultConfiguration()    //
 
     public var startTime: CMTime = CMTime.zero
     public var duration: CMTime {
@@ -38,47 +38,49 @@ public class Clip {
         CMTimeRange(start: startTime, duration: duration)
     }
 
+    public var isReady: Bool {
+        switch resource.status {
+        case .available:
+            return true
+        default:
+            return false
+        }
+    }
+
     public init(resource: Resource, identifier: String = UUID().uuidString) {
         self.identifier = identifier
         self.resource = resource
     }
 
-    func prepare(completion: @escaping (ResourceStatus) -> Void) {
+    public func prepare(completion: @escaping (ResourceStatus) -> Void) {
         _ = resource.prepare(progressHandler: nil, completion: completion)
     }
-}
 
-extension Clip: VideoCompositionTrackProvider {
+    public func numberOfAudioTracks() -> Int {
+        resource.tracks(for: .audio).count
+    }
 
     public func numberOfVideoTracks() -> Int {
         resource.tracks(for: .video).count
     }
+}
 
-    public func videoCompositionTrack(at index: Int, for composition: AVMutableComposition, preferredTrackID: Int32, timeRange: CMTimeRange) -> AVCompositionTrack? {
-        let trackInfo = resource.trackInfo(for: .video, at: index)
-        let track = trackInfo.track
+extension Clip: VideoCompositionProvider {
 
-        let compositionTrack: AVMutableCompositionTrack? = {
-            if let track = composition.track(withTrackID: preferredTrackID) {
-                return track
+    public func applyEffect(to sourceImage: CIImage, at time: CMTime, renderSize: CGSize) -> CIImage {
+        var finalImage: CIImage = {
+            let relativeTime = time - self.startTime
+            if let sourceImage = resource.image(at: relativeTime, renderSize: renderSize) {
+                return sourceImage
             }
-            return composition.addMutableTrack(withMediaType: track.mediaType, preferredTrackID: preferredTrackID)
+            return sourceImage
         }()
 
-        guard let compositionTrack = compositionTrack else {
-            return nil
+        if let videoPostProcessing = videoPostProcessing {
+            let info = VideoPostProcessingInfo(time: time, renderSize: renderSize, timeRange: timeRange)
+            finalImage = videoPostProcessing.applyEffect(to: finalImage, info: info)
         }
-
-        compositionTrack.preferredTransforms[timeRange.vf_identifier] = track.preferredTransform
-        do {
-//            compositionTrack.removeTimeRange(CMTimeRange(start: timeRange.start, duration: trackInfo.scaleToDuration))
-            print("insert time range: \(trackInfo.selectedTimeRange) input: \(timeRange)")
-            try compositionTrack.insertTimeRange(trackInfo.selectedTimeRange, of: trackInfo.track, at: timeRange.start)
-//            compositionTrack.scaleTimeRange(CMTimeRange(start: timeRange.start, duration: trackInfo.selectedTimeRange.duration), toDuration: trackInfo.scaleToDuration)
-        } catch {
-            debugPrint(#function + error.localizedDescription)
-        }
-        return compositionTrack
+        return finalImage
     }
 
 }
@@ -110,4 +112,46 @@ extension CMTimeRange {
     var vf_identifier: String {
         return "{\(String(format: "%.3f", start.seconds)), \(String(format: "%.3f", duration.seconds))}"
     }
+}
+
+
+extension AVMutableComposition {
+
+    func addResource(trackID: Int32, with resourceTrackInfo: ResourceTrackInfo, at time: CMTime) throws {
+        let assetTrack = resourceTrackInfo.track
+
+        let compositionTrack: AVMutableCompositionTrack? = {
+            if let track = track(withTrackID: trackID) {
+                return track
+            }
+            return addMutableTrack(withMediaType: assetTrack.mediaType, preferredTrackID: trackID)
+        }()
+
+        guard let compositionTrack = compositionTrack else {
+            throw MTTimelineCompositionError.noCompositionTrack
+        }
+
+
+        let selectedTimeRange = { () -> CMTimeRange in
+            let duration = min(assetTrack.timeRange.duration, resourceTrackInfo.selectedTimeRange.duration)
+            return CMTimeRange(start: resourceTrackInfo.selectedTimeRange.start, duration: duration)
+        }()
+
+        try compositionTrack.insertTimeRange(selectedTimeRange, of: resourceTrackInfo.track, at: time)
+
+        //            if selectedTimeRange.duration < timeRange.duration {
+        //                let emptyTimeRange = { () -> CMTimeRange in
+        //                    let start = CMTimeAdd(timeRange.start, selectedTimeRange.duration)
+        //                    let duration = CMTimeSubtract(timeRange.duration, selectedTimeRange.duration)
+        //                    return CMTimeRange(start: start, duration: duration)
+        //                }()
+        //                compositionTrack.insertEmptyTimeRange(emptyTimeRange)
+        //            }
+
+        if let scaleToDuration = resourceTrackInfo.scaleToDuration {
+            let timeRange = CMTimeRange(start: time, duration: selectedTimeRange.duration)
+            compositionTrack.scaleTimeRange(timeRange, toDuration: scaleToDuration)
+        }
+    }
+
 }

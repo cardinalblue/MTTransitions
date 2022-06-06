@@ -177,15 +177,22 @@ class TimelineSampleViewController: UIViewController {
         let resource1 = AVAssetResource(asset: loadVideoAsset(named: "clip1")!, selectedTimeRange: nil)
         let resource2 = AVAssetResource(asset: loadVideoAsset(named: "clip2")!, selectedTimeRange: nil)
         let resource3 = AVAssetResource(asset: loadVideoAsset(named: "clip3")!, selectedTimeRange: nil)
+        let resource4 = { () -> Resource in
+            let image = UIImage(named: "wallpaper01.jpg")!
+            let ciImage = CIImage(cgImage: image.cgImage!)
+            return ImageResource(image: ciImage, duration: CMTime(seconds: 5, preferredTimescale: 1000))
+        }()
         timeline.clips = [
             Clip(resource: resource1),
             Clip(resource: resource2),
-            Clip(resource: resource3)
+            Clip(resource: resource3),
+            Clip(resource: resource4)
         ]
-        timeline.transitions = [
-            MTTransition.Effect.angular,
-            MTTransition.Effect.angular
-        ]
+//        timeline.transitions = [
+//            MTTransition.Effect.angular,
+//            MTTransition.Effect.angular,
+//            MTTransition.Effect.angular
+//        ]
 
         let composition = MTTimelineComposition(timeline: timeline)
         do {

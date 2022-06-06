@@ -9,7 +9,7 @@ import AVFoundation
 import CoreMedia
 import Foundation
 
-class ImageResource: Resource {
+public class ImageResource: Resource {
 
     public var image: CIImage
 
@@ -34,13 +34,22 @@ class ImageResource: Resource {
         self.selectedTimeRange = CMTimeRange(start: CMTime.zero, duration: duration)
     }
 
+    public func update(selectedTimeRange: CMTimeRange) throws {
+        self.duration = selectedTimeRange.duration
+        self.selectedTimeRange = CMTimeRange(start: .zero, duration: duration)
+    }
+
     public func image(at time: CMTime, renderSize: CGSize) -> CIImage? {
         image
     }
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange)
+        let emptyDuration = CMTime(seconds: 1, preferredTimescale: 30)
+        let emptyTimeRange = CMTimeRangeMake(start: CMTime.zero, duration: emptyDuration)
+        return ResourceTrackInfo(track: track,
+                                 selectedTimeRange: selectedTimeRange,
+                                 scaleToDuration: duration)
     }
 
     public func prepare(progressHandler: ((Double) -> Void)?, completion: @escaping (ResourceStatus) -> Void) -> ResourceTask? {

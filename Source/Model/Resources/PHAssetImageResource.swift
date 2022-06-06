@@ -47,13 +47,18 @@ open class PHAssetImageResource: Resource {
         self.imageManger = imageManager
     }
 
+    public func update(selectedTimeRange: CMTimeRange) throws {
+        self.duration = selectedTimeRange.duration
+        self.selectedTimeRange = CMTimeRange(start: .zero, duration: duration)
+    }
+
     public func image(at time: CMTime, renderSize: CGSize) -> CIImage? {
         return image
     }
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange)
+        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange, scaleToDuration: duration)
     }
 
     @discardableResult

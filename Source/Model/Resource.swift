@@ -11,6 +11,8 @@ import Foundation
 public protocol Resource {
 
     var size: CGSize { get }
+
+    /// The max duration of this resource
     var duration: CMTime { get }
 
     /// Selected time range, indicate how many resources will be inserted to AVCompositionTrack
@@ -21,22 +23,24 @@ public protocol Resource {
 
     func prepare(progressHandler:((Double) -> Void)?, completion: @escaping (ResourceStatus) -> Void) -> ResourceTask?
 
+    func update(selectedTimeRange: CMTimeRange) throws
+
     func image(at time: CMTime, renderSize: CGSize) -> CIImage?
 
     // MARK: Tracks
     func tracks(for type: AVMediaType) -> [AVAssetTrack]
     func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo
-
 }
 
 public struct ResourceTrackInfo {
     public var track: AVAssetTrack
     public var selectedTimeRange: CMTimeRange
-    //    public var scaleToDuration: CMTime
+    public var scaleToDuration: CMTime?
 }
 
 public enum ResourceError: Error {
     case isEmpty
+    case outOfRange
 }
 
 public enum ResourceStatus {
@@ -69,7 +73,7 @@ private extension AVAsset {
         }
 
         // For CocoaPods
-        if let bundleURL = bundle.resourceURL?.appendingPathComponent("MTTransitions.bundle") {
+        if let bundleURL = bundle.resourceURL?.appendingPathComponent("Assets.bundle") {
             let resourceBundle = Bundle.init(url: bundleURL)
             if let videoURL = resourceBundle?.url(forResource: "black_empty", withExtension: "mp4") {
                 return AVAsset(url: videoURL)

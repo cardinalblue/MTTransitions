@@ -8,6 +8,33 @@
 import Foundation
 import CoreMedia
 
+public protocol TransitionProvider {
+    func transition(for index: Int) -> (effect: MTTransition.Effect, duration: CMTime)?
+}
+
+public struct DefaultTransitionProvider: TransitionProvider {
+
+    let transition: (effect: MTTransition.Effect, duration: CMTime)
+
+    public init(transition: (effect: MTTransition.Effect, duration: CMTime)) {
+        self.transition = transition
+    }
+
+    public init(effect: MTTransition.Effect = .none, seconds: TimeInterval = 0) {
+        self.transition = (effect, CMTime(seconds: seconds, preferredTimescale: 1000))
+    }
+
+    public func transition(for index: Int) -> (effect: MTTransition.Effect, duration: CMTime)? {
+        transition
+        //        if index % 2 == 0 {
+        //            return (MTTransition.Effect.angular, CMTime(seconds: 2, preferredTimescale: 1000))
+        //        } else {
+        //            return (MTTransition.Effect.circle, CMTime(seconds: 1, preferredTimescale: 1000))
+        //        }
+    }
+
+}
+
 public class Timeline {
 
     public init() {}
@@ -15,78 +42,40 @@ public class Timeline {
     public var renderSize: CGSize = CGSize(width: 960, height: 540)
     public var backgroundColor: CIColor = CIColor(red: 0, green: 0, blue: 0)
     public var clips: [Clip] = []
-    public var transitions: [MTTransition.Effect] = []
+    public var transitionProvider: TransitionProvider? = DefaultTransitionProvider()
 
     struct CompositionInstruction: CustomStringConvertible {
-        /// The available time ranges for the movie clips.
-        let clipTimeRanges: [CMTimeRange]
+        /// The available time ranges for the movie clips (video and audio).
+        let clipTrackInfos: [TrackInfo]
 
         /// The time range in which the clips should pass through.
-        let passThroughTimeRanges: [CMTimeRange]
+        let passThroughTrackInfos: [TrackInfo]
 
         /// The transition time range for the clips.
-        let transitionTimeRanges: [CMTimeRange]
+        let transitionTrackInfos: [TransitionTrackInfo]
 
-        let videoTrackIDs: [Int: CMPersistentTrackID]
+//        var description: String {
+//            """
+//            clipTimeRanges: \(clipTimeRanges)
+//            passThroughTimeRanges: \(passThroughTimeRanges)
+//            transitionTimeRanges: \(transitionTimeRanges)
+//            videoTrackIDs: \(videoTrackIDs)
+//            """
+//        }
 
         var description: String {
-            """
-            clipTimeRanges: \(clipTimeRanges)
-            passThroughTimeRanges: \(passThroughTimeRanges)
-            transitionTimeRanges: \(transitionTimeRanges)
-            videoTrackIDs: \(videoTrackIDs)
-            """
+            return "gg"
+//            """
+//            clipTimeRanges: \(clipTrackInfos.map { $0.timeRange })
+//            passThroughTimeRanges: \(passThroughTrackInfos.map { $0.timeRange })
+//            transitionTimeRanges: \(transitionTrackInfos.map { $0.timeRange })
+//            """
         }
 
+
     }
 
-    private var _incrementTrackID: Int32 = 0
-    private func generateNextTrackID() -> Int32 {
-        _incrementTrackID += 1
-        return _incrementTrackID
-    }
-
-    private func reset() {
-        _incrementTrackID = 0
-    }
-
-    private func buildTracks() -> [Int: CMPersistentTrackID] {
-        return [
-            0: 1001,
-            1: 2001,
-        ]
-        
-        var videoTrackIDs: [Int: Int32] = [:]
-
-        func getVideoTrackID(for index: Int) -> CMPersistentTrackID {
-            if let trackID = videoTrackIDs[index] {
-                return trackID
-            }
-            let trackID = generateNextTrackID()
-            videoTrackIDs[index] = trackID
-            return trackID
-        }
-
-        //  0 + (0 % 2 + 1) * 1000 = (0 + 1) * 1000 = 1000
-        //  0 + (1 % 2 + 1) * 1000 = (1 + 1) * 1000 = 2000
-        //  0 + (2 % 2 + 1) * 1000 = (0 + 1) * 1000 = 1000
-        //  0 + (3 % 2 + 1) * 1000 = (1 + 1) * 1000 = 2000
-        //  0 + (4 % 2 + 1) * 1000 = (0 + 1) * 1000 = 1000
-        //  0 + (5 % 2 + 1) * 1000 = (1 + 1) * 1000 = 2000
-        var result: [Int: CMPersistentTrackID] = [:]
-        clips
-            .enumerated()
-            .forEach { offset, clip in
-                for index in 0..<clip.numberOfVideoTracks() {
-//                    let trackID: Int32 = getVideoTrackID(for: index) + Int32((offset % 2 + 1) * 1000)
-                    result[offset] = Int32(index)
-                }
-            }
-        return result
-    }
-
-
-    func build() -> CompositionInstruction {
+    func build() throws -> CompositionInstruction {
 //        let semaphore = DispatchSemaphore(value: 0)
 //        for clip in clips {
 //            clip.prepare { status in
@@ -94,6 +83,9 @@ public class Timeline {
 //            }
 //            semaphore.wait()
 //        }
+
+        // TODO: check index boundary. The `transitions.count` should be equal to` clips.count - 1`.
+        // TODO: handle `none` transition type.
 
         // CTR -> clip time range
         // PTR -> passThrough time range
@@ -109,26 +101,38 @@ public class Timeline {
         // ------------------------------------------------------------------------------------------------>
 
         // Calculate transition duration
-        let transitionDuration: CMTime = { () -> CMTime in
-            var duration = CMTime(seconds: 2, preferredTimescale: 1000)
-            // Make transitionDuration no greater than half the shortest clip duration.
-            for clip in clips {
-                var halfClipDuration = clip.duration
-                // You can halve a rational by doubling its denominator.
-                halfClipDuration.timescale *= 2
-                duration = CMTimeMinimum(duration, halfClipDuration)
+        var transitionTimeInfo: [Int: CMTime] = [:]
+        (0..<clips.count - 1).forEach { transitionIndex in
+            guard let transition = transitionProvider?.transition(for: transitionIndex) else {
+                transitionTimeInfo[transitionIndex] = CMTime.zero
+                return
             }
-            return duration
-        }()
+            let duration = transition.duration
+            transitionTimeInfo[transitionIndex] = duration
+        }
+
+//        let transitionDuration: CMTime = { () -> CMTime in
+//            var duration = CMTime(seconds: 2, preferredTimescale: 1000)
+//            // Make transitionDuration no greater than half the shortest clip duration.
+//            for clip in clips {
+//                var halfClipDuration = clip.duration
+//                // You can halve a rational by doubling its denominator.
+//                halfClipDuration.timescale *= 2
+//                duration = CMTimeMinimum(duration, halfClipDuration)
+//            }
+//            return duration
+//        }()
 
         // - Build start time for each clip
         var nextClipStartTime = CMTime.zero
-        let clipTimeRanges: [CMTimeRange] = clips.map { clip -> CMTimeRange in
+        let clipTimeRanges: [CMTimeRange] = clips.enumerated().map { index, clip -> CMTimeRange in
             let startTime = nextClipStartTime
             /*
              The end of this clip will overlap the start of the next by transitionDuration.
              (Note: this arithmetic falls apart if timeRangeInAsset.duration < 2 * transitionDuration.)
              */
+            let transitionDuration = transitionTimeInfo[index, default: CMTime.zero]
+
             nextClipStartTime = CMTimeAdd(nextClipStartTime, clip.duration)
             nextClipStartTime = CMTimeSubtract(nextClipStartTime, transitionDuration)
             return CMTimeRange(start: startTime, duration: clip.duration)
@@ -136,38 +140,132 @@ public class Timeline {
 
         // - Build pass through time for each clip
 
-        let passThroughTimeRanges: [CMTimeRange] = clipTimeRanges.enumerated().map { index, timeRange -> CMTimeRange in
+        let passthroughTimeRanges: [CMTimeRange] = clipTimeRanges.enumerated().map { index, timeRange -> CMTimeRange in
+            let transitionDurationFront = transitionTimeInfo[index - 1, default: CMTime.zero]
+            let transitionDurationBack = transitionTimeInfo[index, default: CMTime.zero]
+
             var passThroughTimeRange = timeRange
+            // Adjust time range for front transition
             if index > 0 {
-                passThroughTimeRange.start = CMTimeAdd(passThroughTimeRange.start, transitionDuration)
-                passThroughTimeRange.duration = CMTimeSubtract(passThroughTimeRange.duration, transitionDuration)
+                passThroughTimeRange.start = CMTimeAdd(passThroughTimeRange.start, transitionDurationFront)
+                passThroughTimeRange.duration = CMTimeSubtract(passThroughTimeRange.duration, transitionDurationFront)
             }
+            // Adjust time range for back transition
             if index < clips.count - 1 {
-                passThroughTimeRange.duration = CMTimeSubtract(passThroughTimeRange.duration, transitionDuration)
+                passThroughTimeRange.duration = CMTimeSubtract(passThroughTimeRange.duration, transitionDurationBack)
             }
             return passThroughTimeRange
         }
 
         // - Build transition time ranges
-        // TODO: check index boundary. The `transitions.count` should be equal to` clips.count - 1`.
         let transitionTimeRanges: [CMTimeRange] = { () -> [CMTimeRange] in
             guard clipTimeRanges.count > 1 else {
                 return []
             }
-            return clipTimeRanges[1..<clipTimeRanges.count].map {
-                CMTimeRange(start: $0.start, duration: transitionDuration)
+            return clipTimeRanges[1..<clipTimeRanges.count].enumerated().map { index, timeRange -> CMTimeRange in
+                let transitionDuration = transitionTimeInfo[index, default: CMTime.zero]
+                return CMTimeRange(start: timeRange.start, duration: transitionDuration)
             }
         }()
 
         // - Build tracks
-        let videoTrackIDs = buildTracks()
+
+        func makeTrackID(trackIndex: Int, clipIndex: Int, mediaType: TrackInfo.MediaType) -> CMPersistentTrackID {
+            switch mediaType {
+            case .video:
+                return Int32(trackIndex) + Int32((clipIndex % 2 + 1) * 100)
+            case .audio:
+                return Int32(trackIndex) + Int32((clipIndex % 2 + 1) * 1000)
+            }
+        }
+
+        // - Track Info for clips
+        let clipTrackInfos: [TrackInfo] = zip(clips, clipTimeRanges)
+            .enumerated()
+            .flatMap { offset, info -> [TrackInfo] in
+                let (clip, timeRange) = info
+                var trackInfos = [TrackInfo]()
+                // Video
+                for index in 0..<clip.numberOfVideoTracks() {
+                    let trackID = makeTrackID(trackIndex: index, clipIndex: offset, mediaType: .video)
+                    let trackInfo = TrackInfo(clip: clip, index: index, mediaType: .video, trackID: trackID, timeRange: timeRange)
+                    trackInfos.append(trackInfo)
+                }
+
+                // Audio
+                for index in 0..<clip.numberOfAudioTracks() {
+                    let trackID = makeTrackID(trackIndex: index, clipIndex: offset, mediaType: .audio)
+                    let trackInfo = TrackInfo(clip: clip, index: index, mediaType: .audio, trackID: trackID, timeRange: timeRange)
+                    trackInfos.append(trackInfo)
+                }
+                return trackInfos
+            }
+
+        // - Track Info for passthroughs
+        let passthroughTrackInfos: [TrackInfo] = zip(clips, passthroughTimeRanges)
+            .enumerated()
+            .flatMap { offset, info -> [TrackInfo] in
+                let (clip, timeRange) = info
+                var trackInfos = [TrackInfo]()
+                for index in 0..<clip.numberOfVideoTracks() {
+                    let trackID = makeTrackID(trackIndex: index, clipIndex: offset, mediaType: .video)
+                    let trackInfo = TrackInfo(clip: clip, index: index, mediaType: .video, trackID: trackID, timeRange: timeRange)
+                    trackInfos.append(trackInfo)
+                }
+                return trackInfos
+            }
+
+        // - Track Info for transitions
+        let transitionTrackInfos = zip(clips.pairwise() , transitionTimeRanges)
+            .enumerated()
+            .compactMap { offset, info -> TransitionTrackInfo? in
+                let (clips, timeRange) = info
+                let effect = transitionProvider?.transition(for: offset)?.effect ?? .none
+                // Apply transition on the main track which the index should be 0
+                let fromTrackID = makeTrackID(trackIndex: 0, clipIndex: offset, mediaType: .video)
+                let toTrackID = makeTrackID(trackIndex: 0, clipIndex: offset + 1, mediaType: .video)
+                let trackInfo = TransitionTrackInfo(
+                    from: (clips.0, fromTrackID),
+                    to: (clips.1, toTrackID),
+                    effect: effect,
+                    timeRange: timeRange
+                )
+                return trackInfo
+            }
 
         return CompositionInstruction(
-            clipTimeRanges: clipTimeRanges,
-            passThroughTimeRanges: passThroughTimeRanges,
-            transitionTimeRanges: transitionTimeRanges,
-            videoTrackIDs: videoTrackIDs
+            clipTrackInfos: clipTrackInfos,
+            passThroughTrackInfos: passthroughTrackInfos,
+            transitionTrackInfos: transitionTrackInfos
         )
     }
 
+}
+
+// MARK: Track Info
+
+struct TrackInfo {
+
+    enum MediaType {
+        case video
+        case audio
+    }
+
+    let clip: Clip
+    let index: Int
+    let mediaType: MediaType
+    let trackID: Int32
+    let timeRange: CMTimeRange
+}
+
+struct TransitionTrackInfo {
+    let from: (clip: Clip, trackID: Int32)
+    let to: (clip: Clip, trackID: Int32)
+    let effect: MTTransition.Effect
+    let timeRange: CMTimeRange
+
+    var description: String {
+        """
+        """
+    }
 }

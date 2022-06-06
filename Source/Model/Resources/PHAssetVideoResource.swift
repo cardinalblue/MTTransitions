@@ -33,10 +33,22 @@ public class PHAssetVideoResource: Resource {
         self.imageManager = imageManager
         self.size = CGSize(width: phAsset.pixelWidth, height: phAsset.pixelHeight)
         self.duration = CMTime(value: Int64(phAsset.duration * 600), timescale: 600)
-        selectedTimeRange = CMTimeRangeMake(start: CMTime.zero, duration: duration)
+        self.selectedTimeRange = CMTimeRangeMake(start: CMTime.zero, duration: duration)
     }
 
     // MARK: Resource functions
+
+    public func update(selectedTimeRange: CMTimeRange) throws {
+        guard selectedTimeRange.start < duration else {
+            throw ResourceError.outOfRange
+        }
+
+        if selectedTimeRange.end > duration {
+            self.selectedTimeRange = CMTimeRange(start: selectedTimeRange.start, end: duration - selectedTimeRange.start)
+        } else {
+            self.selectedTimeRange = selectedTimeRange
+        }
+    }
 
     public func image(at time: CMTime, renderSize: CGSize) -> CIImage? {
         nil
@@ -51,8 +63,7 @@ public class PHAssetVideoResource: Resource {
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        return ResourceTrackInfo(track: track,
-                                 selectedTimeRange: selectedTimeRange)
+        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange, scaleToDuration: nil)
     }
 
     // MARK: - Load

@@ -20,7 +20,7 @@ public class AVAssetResource: Resource {
 
     public var selectedTimeRange: CMTimeRange
 
-    public var status: ResourceStatus = .unavailable(ResourceError.isEmpty)
+    public var status: ResourceStatus = .available
 
     // MARK: Object lifecycle
 
@@ -81,6 +81,17 @@ public class AVAssetResource: Resource {
 
     // MARK: - Resource functions
 
+    public func update(selectedTimeRange: CMTimeRange) throws {
+        guard selectedTimeRange.start < duration else {
+            throw ResourceError.outOfRange
+        }
+        if selectedTimeRange.end > duration {
+            self.selectedTimeRange = CMTimeRange(start: selectedTimeRange.start, end: duration - selectedTimeRange.start)
+        } else {
+            self.selectedTimeRange = selectedTimeRange
+        }
+    }
+
     public func image(at time: CMTime, renderSize: CGSize) -> CIImage? {
         nil
     }
@@ -91,7 +102,7 @@ public class AVAssetResource: Resource {
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange)
+        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange, scaleToDuration: nil)
     }
 
 }
