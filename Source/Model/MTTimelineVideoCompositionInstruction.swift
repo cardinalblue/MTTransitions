@@ -154,12 +154,3 @@ open class MTTimelineVideoCompositionLayerInstruction: CustomDebugStringConverti
         return "<MTTimelineVideoCompositionLayerInstruction, trackID: \(trackID), timeRange: {start: \(timeRange.start.seconds), duration: \(timeRange.duration.seconds)}>"
     }
 }
-
-
-private extension CIImage {
-    func flipYCoordinate() -> CIImage {
-        let flipYTransform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: extent.origin.y * 2 + extent.height)
-        return transformed(by: flipYTransform)
-    }
-}
-

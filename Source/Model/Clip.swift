@@ -28,6 +28,10 @@ public class Clip {
     public var isVideoTrackEnabled: Bool = true
     public var isAudioTrackEnabled: Bool = true
 
+    public var preferredTransform: CGAffineTransform? {
+        resource.tracks(for: .video).first?.preferredTransform
+    }
+
     public var videoPostProcessing: VideoProcessing? = BasicVideoConfiguration.createDefaultConfiguration()
 
     //    public var audioConfiguration: AudioConfiguration = .createDefaultConfiguration()    //
@@ -84,6 +88,10 @@ extension Clip: VideoCompositionProvider {
             }
             return sourceImage
         }()
+
+        if let preferredTransform = preferredTransform, preferredTransform != .identity {
+            finalImage = finalImage.flipYCoordinate().transformed(by: preferredTransform).flipYCoordinate()
+        }
 
         if let videoPostProcessing = videoPostProcessing {
             let info = VideoPostProcessingInfo(time: time, renderSize: renderSize, timeRange: timeRange)
