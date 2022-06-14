@@ -25,6 +25,9 @@ public class Clip {
     public var identifier: String
     public var resource: Resource
 
+    public var isVideoTrackEnabled: Bool = true
+    public var isAudioTrackEnabled: Bool = true
+
     public var videoPostProcessing: VideoProcessing? = BasicVideoConfiguration.createDefaultConfiguration()
 
     //    public var audioConfiguration: AudioConfiguration = .createDefaultConfiguration()    //
@@ -57,11 +60,17 @@ public class Clip {
     }
 
     public func numberOfAudioTracks() -> Int {
-        resource.tracks(for: .audio).count
+        guard isAudioTrackEnabled else {
+            return 0
+        }
+        return resource.tracks(for: .audio).count
     }
 
     public func numberOfVideoTracks() -> Int {
-        resource.tracks(for: .video).count
+        guard isVideoTrackEnabled else {
+            return 0
+        }
+        return resource.tracks(for: .video).count
     }
 }
 
