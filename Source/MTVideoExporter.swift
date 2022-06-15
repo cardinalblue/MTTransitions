@@ -23,7 +23,8 @@ public class MTVideoExporter {
     
     public init(composition: AVMutableComposition,
                 videoComposition: AVMutableVideoComposition,
-                presetName: String = AVAssetExportPresetHighestQuality) throws {
+                presetName: String = AVAssetExportPresetHighestQuality,
+                metadata: [AVMetadataItem]? = nil) throws {
         self.composition = composition
         self.videoComposition = videoComposition
         guard let session = AVAssetExportSession(asset: composition, presetName: presetName) else {
@@ -31,6 +32,7 @@ public class MTVideoExporter {
         }
         self.exportSession = session
         self.exportSession.videoComposition = videoComposition
+        self.exportSession.metadata = metadata
     }
     
     /// Export the composition to local file.
