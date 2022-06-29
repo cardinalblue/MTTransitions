@@ -37,46 +37,51 @@ public class AVAssetResource: Resource {
 
     @discardableResult
     public func prepare(progressHandler:((Double) -> Void)? = nil, completion: @escaping (ResourceStatus) -> Void) -> ResourceTask? {
-        let asset = self.asset
+        switch status {
+        case .available:
+            completion(.available)
+            return nil
+        case .unavailable:
+            let asset = self.asset
+            asset.loadValuesAsynchronously(forKeys: ["tracks", "duration"], completionHandler: { [weak self] in
+                guard let self = self else { return }
 
-        asset.loadValuesAsynchronously(forKeys: ["tracks", "duration"], completionHandler: { [weak self] in
-            guard let self = self else { return }
-
-            func finished() {
-                if asset.tracks.count > 0 {
-                    if let track = asset.tracks(withMediaType: .video).first {
-                        self.size = track.naturalSize.applying(track.preferredTransform)
+                func finished() {
+                    if asset.tracks.count > 0 {
+                        if let track = asset.tracks(withMediaType: .video).first {
+                            self.size = track.naturalSize.applying(track.preferredTransform)
+                        }
+                        self.status = .available
+                        self.duration = asset.duration
                     }
-                    self.status = .available
-                    self.duration = asset.duration
+                    DispatchQueue.main.async {
+                        completion(self.status)
+                    }
                 }
-                DispatchQueue.main.async {
-                    completion(self.status)
+
+                var error: NSError?
+                let tracksStatus = asset.statusOfValue(forKey: "tracks", error: &error)
+                if tracksStatus != .loaded {
+                    self.status = .unavailable(error)
+                    debugPrint("Failed to load tracks, status: \(tracksStatus), error: \(String(describing: error))")
+                    finished()
+                    return
                 }
-            }
 
-            var error: NSError?
-            let tracksStatus = asset.statusOfValue(forKey: "tracks", error: &error)
-            if tracksStatus != .loaded {
-                self.status = .unavailable(error)
-                debugPrint("Failed to load tracks, status: \(tracksStatus), error: \(String(describing: error))")
+                let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
+                if durationStatus != .loaded {
+                    self.status = .unavailable(error);
+                    debugPrint("Failed to duration tracks, status: \(tracksStatus), error: \(String(describing: error))")
+                    finished()
+                    return
+                }
                 finished()
-                return
-            }
+            })
 
-            let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
-            if durationStatus != .loaded {
-                self.status = .unavailable(error);
-                debugPrint("Failed to duration tracks, status: \(tracksStatus), error: \(String(describing: error))")
-                finished()
-                return
-            }
-            finished()
-        })
-
-        return ResourceTask(cancel: {
-            asset.cancelLoading()
-        })
+            return ResourceTask(cancel: {
+                asset.cancelLoading()
+            })
+        }
     }
 
     // MARK: - Resource functions

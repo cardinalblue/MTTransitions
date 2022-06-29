@@ -21,6 +21,7 @@ public protocol Resource {
     /// Resource's status, indicate whether the tracks are available. Default is available
     var status: ResourceStatus { get }
 
+    // The completion block must be called in your implementation.
     func prepare(progressHandler:((Double) -> Void)?, completion: @escaping (ResourceStatus) -> Void) -> ResourceTask?
 
     func update(selectedTimeRange: CMTimeRange) throws

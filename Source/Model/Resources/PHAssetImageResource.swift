@@ -66,56 +66,60 @@ open class PHAssetImageResource: Resource {
         progressHandler:((Double) -> Void)? = nil,
         completion: @escaping (ResourceStatus) -> Void
     ) -> ResourceTask? {
-        status = .unavailable(ResourceError.isEmpty)
-
-        let progressHandler: PHAssetImageProgressHandler = { progress, error, stop, info in
-            if let isCancelled = info?[PHImageCancelledKey] as? NSNumber, isCancelled.boolValue {
-                return
-            }
-            if error != nil {
-                return
-            }
-            DispatchQueue.main.async {
-                progressHandler?(progress)
-            }
-        }
-
-        let imageRequestOptions = PHImageRequestOptions()
-        imageRequestOptions.version = .current
-        imageRequestOptions.deliveryMode = .highQualityFormat
-        imageRequestOptions.isNetworkAccessAllowed = true
-        imageRequestOptions.progressHandler = progressHandler
-
-        let requestID = imageManger.requestImage(
-            for: asset,
-               targetSize: size,
-               contentMode: .aspectFit,
-               options: imageRequestOptions
-        ) { [weak self] image, info in
-
-            guard let self = self else { return }
-
-            DispatchQueue.main.async {
-                if let image = image {
-                    self.image = CIImage(image: image)
-                    self.status = .available
-                    completion(self.status)
-                } else {
-                    let error: Error? = { () -> Error? in
-                        if let requestError = info?[PHImageErrorKey] as? Error {
-                            return requestError
-                        }
-                        return ResourceError.isEmpty
-                    }()
-                    self.status = .unavailable(error)
-                    completion(self.status)
+        switch status {
+        case .available:
+            completion(.available)
+            return nil
+        case .unavailable:
+            let progressHandler: PHAssetImageProgressHandler = { progress, error, stop, info in
+                if let isCancelled = info?[PHImageCancelledKey] as? NSNumber, isCancelled.boolValue {
+                    return
+                }
+                if error != nil {
+                    return
+                }
+                DispatchQueue.main.async {
+                    progressHandler?(progress)
                 }
             }
-        }
 
-        return ResourceTask(cancel: { [weak imageManger] in
-            imageManger?.cancelImageRequest(requestID)
-        })
+            let imageRequestOptions = PHImageRequestOptions()
+            imageRequestOptions.version = .current
+            imageRequestOptions.deliveryMode = .highQualityFormat
+            imageRequestOptions.isNetworkAccessAllowed = true
+            imageRequestOptions.progressHandler = progressHandler
+
+            let requestID = imageManger.requestImage(
+                for: asset,
+                   targetSize: size,
+                   contentMode: .aspectFit,
+                   options: imageRequestOptions
+            ) { [weak self] image, info in
+
+                guard let self = self else { return }
+
+                DispatchQueue.main.async {
+                    if let image = image {
+                        self.image = CIImage(image: image)
+                        self.status = .available
+                        completion(self.status)
+                    } else {
+                        let error: Error? = { () -> Error? in
+                            if let requestError = info?[PHImageErrorKey] as? Error {
+                                return requestError
+                            }
+                            return ResourceError.isEmpty
+                        }()
+                        self.status = .unavailable(error)
+                        completion(self.status)
+                    }
+                }
+            }
+
+            return ResourceTask(cancel: { [weak imageManger] in
+                imageManger?.cancelImageRequest(requestID)
+            })
+        }
     }
 
 }
