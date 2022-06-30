@@ -73,56 +73,57 @@ public class PHAssetVideoResource: Resource {
         progressHandler:((Double) -> Void)? = nil,
         completion: @escaping (ResourceStatus) -> Void
     ) -> ResourceTask? {
-        guard avAsset == nil else {
+        switch status {
+        case .available:
             completion(.available)
             return nil
-        }
-
-        let options = PHVideoRequestOptions()
-        options.isNetworkAccessAllowed = true
-        options.version = .current
-        options.deliveryMode = .highQualityFormat
-        options.progressHandler = { (progress, error, stop, info) in
-            if let isCancelled = info?[PHImageCancelledKey] as? NSNumber, isCancelled.boolValue {
-                return
-            }
-            if error != nil {
-                return
-            }
-            DispatchQueue.main.async {
-                progressHandler?(progress)
-            }
-        }
-
-        let requestID = imageManager.requestAVAsset(
-            forVideo: phAsset, options: options
-        ) { [weak self] (asset, audioMix, info) in
-            guard let self = self else { return }
-
-            if let asset = asset {
-                self.avAsset = asset
-                self.duration = asset.duration
-                if let track = asset.tracks(withMediaType: .video).first {
-                    self.size = track.naturalSize.applying(track.preferredTransform)
+        case .unavailable:
+            let options = PHVideoRequestOptions()
+            options.isNetworkAccessAllowed = true
+            options.version = .current
+            options.deliveryMode = .highQualityFormat
+            options.progressHandler = { (progress, error, stop, info) in
+                if let isCancelled = info?[PHImageCancelledKey] as? NSNumber, isCancelled.boolValue {
+                    return
                 }
-                self.status = .available
-            } else {
-                let error: Error? = { () -> Error? in
-                    if let requestError = info?[PHImageErrorKey] as? Error {
-                        return requestError
-                    }
-                    return ResourceError.isEmpty
-                }()
-                self.status = .unavailable(error)
+                if error != nil {
+                    return
+                }
+                DispatchQueue.main.async {
+                    progressHandler?(progress)
+                }
             }
-            DispatchQueue.main.async {
-                completion(self.status)
-            }
-        }
 
-        return ResourceTask(cancel: {
-            PHImageManager.default().cancelImageRequest(requestID)
-        })
+            let requestID = imageManager.requestAVAsset(
+                forVideo: phAsset, options: options
+            ) { [weak self] (asset, audioMix, info) in
+                guard let self = self else { return }
+
+                if let asset = asset {
+                    self.avAsset = asset
+                    self.duration = asset.duration
+                    if let track = asset.tracks(withMediaType: .video).first {
+                        self.size = track.naturalSize.applying(track.preferredTransform)
+                    }
+                    self.status = .available
+                } else {
+                    let error: Error? = { () -> Error? in
+                        if let requestError = info?[PHImageErrorKey] as? Error {
+                            return requestError
+                        }
+                        return ResourceError.isEmpty
+                    }()
+                    self.status = .unavailable(error)
+                }
+                DispatchQueue.main.async {
+                    completion(self.status)
+                }
+            }
+
+            return ResourceTask(cancel: {
+                PHImageManager.default().cancelImageRequest(requestID)
+            })
+        }
     }
 
 }
