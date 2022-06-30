@@ -26,11 +26,6 @@ public struct DefaultTransitionProvider: TransitionProvider {
 
     public func transition(for index: Int) -> (effect: MTTransition.Effect, duration: CMTime)? {
         transition
-        //        if index % 2 == 0 {
-        //            return (MTTransition.Effect.angular, CMTime(seconds: 2, preferredTimescale: 1000))
-        //        } else {
-        //            return (MTTransition.Effect.circle, CMTime(seconds: 1, preferredTimescale: 1000))
-        //        }
     }
 
 }
@@ -44,7 +39,7 @@ public class Timeline {
     public var clips: [Clip] = []
     public var transitionProvider: TransitionProvider? = DefaultTransitionProvider()
 
-    struct CompositionInstruction: CustomStringConvertible {
+    struct CompositionInstruction {
         /// The available time ranges for the movie clips (video and audio).
         let clipTrackInfos: [TrackInfo]
 
@@ -63,29 +58,10 @@ public class Timeline {
 //            """
 //        }
 
-        var description: String {
-            return "gg"
-//            """
-//            clipTimeRanges: \(clipTrackInfos.map { $0.timeRange })
-//            passThroughTimeRanges: \(passThroughTrackInfos.map { $0.timeRange })
-//            transitionTimeRanges: \(transitionTrackInfos.map { $0.timeRange })
-//            """
-        }
-
-
     }
 
     func build() throws -> CompositionInstruction {
-//        let semaphore = DispatchSemaphore(value: 0)
-//        for clip in clips {
-//            clip.prepare { status in
-//                semaphore.signal()
-//            }
-//            semaphore.wait()
-//        }
-
         // TODO: check index boundary. The `transitions.count` should be equal to` clips.count - 1`.
-        // TODO: handle `none` transition type.
 
         // CTR -> clip time range
         // PTR -> passThrough time range
@@ -110,18 +86,6 @@ public class Timeline {
             let duration = transition.duration
             transitionTimeInfo[transitionIndex] = duration
         }
-
-//        let transitionDuration: CMTime = { () -> CMTime in
-//            var duration = CMTime(seconds: 2, preferredTimescale: 1000)
-//            // Make transitionDuration no greater than half the shortest clip duration.
-//            for clip in clips {
-//                var halfClipDuration = clip.duration
-//                // You can halve a rational by doubling its denominator.
-//                halfClipDuration.timescale *= 2
-//                duration = CMTimeMinimum(duration, halfClipDuration)
-//            }
-//            return duration
-//        }()
 
         // - Build start time for each clip
         var nextClipStartTime = CMTime.zero
@@ -266,9 +230,4 @@ struct TransitionTrackInfo {
     let to: (clip: Clip, trackID: Int32)
     let effect: MTTransition.Effect
     let timeRange: CMTimeRange
-
-    var description: String {
-        """
-        """
-    }
 }

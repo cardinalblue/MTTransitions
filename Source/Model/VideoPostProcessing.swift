@@ -45,18 +45,6 @@ public class BasicVideoConfiguration: VideoProcessing {
     public var configurations: [VideoProcessing] = []
     public var background: Background? = .blurred
 
-//    // MARK: - NSCopying
-
-//    public func copy(with zone: NSZone? = nil) -> Any {
-//        let configuration = type(of: self).init()
-//        configuration.contentMode = contentMode
-//        configuration.transform = transform
-//        configuration.opacity = opacity;
-//        configuration.configurations = configurations.map({ $0.copy(with: zone) as! VideoConfigurationProtocol });
-//        configuration.frame = frame;
-//        return configuration
-//    }
-
     // MARK: - VideoConfigurationProtocol
 
     public func applyEffect(to sourceImage: CIImage, info: VideoPostProcessingInfo) -> CIImage {
