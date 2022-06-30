@@ -189,11 +189,6 @@ class TimelineSampleViewController: UIViewController {
             Clip(resource: resource4)
         ]
         timeline.transitionProvider = DefaultTransitionProvider(effect: effect, seconds: 0.5)
-//        timeline.transitions = [
-//            MTTransition.Effect.angular,
-//            MTTransition.Effect.angular,
-//            MTTransition.Effect.angular
-//        ]
 
         let composition = MTTimelineComposition(timeline: timeline)
         do {

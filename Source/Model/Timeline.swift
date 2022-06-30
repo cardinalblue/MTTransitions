@@ -220,6 +220,9 @@ public class Timeline {
             .enumerated()
             .compactMap { offset, info -> TransitionTrackInfo? in
                 let (clips, timeRange) = info
+                guard timeRange.duration != CMTime.zero else {
+                    return nil
+                }
                 let effect = transitionProvider?.transition(for: offset)?.effect ?? .none
                 // Apply transition on the main track which the index should be 0
                 let fromTrackID = makeTrackID(trackIndex: 0, clipIndex: offset, mediaType: .video)
