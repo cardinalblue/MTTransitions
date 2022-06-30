@@ -90,11 +90,7 @@ public class AVAssetResource: Resource {
         guard selectedTimeRange.start < duration else {
             throw ResourceError.outOfRange
         }
-        if selectedTimeRange.end > duration {
-            self.selectedTimeRange = CMTimeRange(start: selectedTimeRange.start, end: duration - selectedTimeRange.start)
-        } else {
-            self.selectedTimeRange = selectedTimeRange
-        }
+        self.selectedTimeRange = selectedTimeRange
     }
 
     public func image(at time: CMTime, renderSize: CGSize) -> CIImage? {
@@ -107,8 +103,16 @@ public class AVAssetResource: Resource {
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange, scaleToDuration: nil)
-    }
 
+        let adjustedTimeRange: CMTimeRange = { () -> CMTimeRange in
+            if selectedTimeRange.end > duration {
+                return CMTimeRange(start: selectedTimeRange.start, end: duration - selectedTimeRange.start)
+            } else {
+                return selectedTimeRange
+            }
+        }()
+
+        return ResourceTrackInfo(track: track, selectedTimeRange: adjustedTimeRange, scaleToDuration: nil)
+    }
 }
 
