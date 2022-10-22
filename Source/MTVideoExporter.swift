@@ -40,7 +40,8 @@ public class MTVideoExporter {
     ///   - fileURL: The output fileURL.
     ///   - outputFileType: The output file type. `mp4` by default.
     ///   - completion: Export completion callback.
-    public func export(to fileURL: URL, outputFileType: AVFileType = .mp4, completion: @escaping MTVideoExporterCompletion) {
+    @discardableResult
+    public func export(to fileURL: URL, outputFileType: AVFileType = .mp4, completion: @escaping MTVideoExporterCompletion) -> AVAssetExportSession {
         
         let fileExists = FileManager.default.fileExists(atPath: fileURL.path)
         if fileExists {
@@ -60,5 +61,7 @@ public class MTVideoExporter {
         exportSession.exportAsynchronously(completionHandler: { [weak self] in
             completion(self?.exportSession.error)
         })
+
+        return exportSession
     }
 }
