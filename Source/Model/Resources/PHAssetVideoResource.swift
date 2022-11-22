@@ -120,9 +120,7 @@ public class PHAssetVideoResource: Resource {
                     }()
                     self.status = .unavailable(error)
                 }
-                DispatchQueue.main.async {
-                    completion(self.status)
-                }
+                completion(self.status)
             }
 
             return ResourceTask(cancel: {
