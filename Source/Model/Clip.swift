@@ -171,4 +171,22 @@ extension AVMutableComposition {
         }
     }
 
+    func addResource(trackID: Int32, with resourceTrackInfo: ResourceTrackInfo, at time: CMTime, duration: CMTime) throws {
+        let assetTrack = resourceTrackInfo.track
+
+        let compositionTrack: AVMutableCompositionTrack? = {
+            if let track = track(withTrackID: trackID) {
+                return track
+            }
+            return addMutableTrack(withMediaType: assetTrack.mediaType, preferredTrackID: trackID)
+        }()
+
+        guard let compositionTrack = compositionTrack else {
+            throw MTTimelineCompositionError.noCompositionTrack
+        }
+
+        let selectedTimeRange = CMTimeRange(start: time, duration: duration)
+        try compositionTrack.insertTimeRange(selectedTimeRange, of: resourceTrackInfo.track, at: time)
+    }
+
 }

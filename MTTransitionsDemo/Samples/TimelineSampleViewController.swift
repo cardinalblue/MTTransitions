@@ -112,8 +112,8 @@ class TimelineSampleViewController: UIViewController {
     }
 
     private func setupVideoPlaybacks() {
-        guard let clip1 = loadVideoAsset(named: "clip1"),
-              let clip2 = loadVideoAsset(named: "clip2") else {
+        guard let clip1 = loadAsset(named: "clip1"),
+              let clip2 = loadAsset(named: "clip2") else {
                   return
               }
         clips = [clip1, clip2]
@@ -174,9 +174,9 @@ class TimelineSampleViewController: UIViewController {
     private func makeComposition(renderSize: CGSize = CGSize(width: 720, height: 720)) {
         let timeline = Timeline()
         timeline.renderSize = renderSize
-        let resource1 = AVAssetResource(asset: loadVideoAsset(named: "clip1")!, selectedTimeRange: nil)
-        let resource2 = AVAssetResource(asset: loadVideoAsset(named: "clip2")!, selectedTimeRange: nil)
-        let resource3 = AVAssetResource(asset: loadVideoAsset(named: "clip3")!, selectedTimeRange: nil)
+        let resource1 = AVAssetResource(asset: loadAsset(named: "clip1")!, selectedTimeRange: nil)
+        let resource2 = AVAssetResource(asset: loadAsset(named: "clip2")!, selectedTimeRange: nil)
+        let resource3 = AVAssetResource(asset: loadAsset(named: "clip3")!, selectedTimeRange: nil)
         let resource4 = { () -> Resource in
             let image = UIImage(named: "wallpaper01.jpg")!
             let ciImage = CIImage(cgImage: image.cgImage!)
@@ -185,9 +185,17 @@ class TimelineSampleViewController: UIViewController {
         timeline.clips = [
             Clip(resource: resource1),
             Clip(resource: resource2),
-            Clip(resource: resource3),
-            Clip(resource: resource4)
+//            Clip(resource: resource3),
+//            Clip(resource: resource4)
         ]
+        timeline.backgroundAudioClip = { () -> Clip in
+            let timeRange = CMTimeRange(start: .zero, duration: CMTime(seconds: 5, preferredTimescale: 1000))
+            let audioResource = AVAssetResource(
+                asset: loadAsset(named: "audio1", withExtension: "mp3")!,
+                selectedTimeRange: timeRange
+            )
+            return Clip(resource: audioResource)
+        }()
         timeline.transitionProvider = DefaultTransitionProvider(effect: effect, seconds: 0.5)
 
         let composition = MTTimelineComposition(timeline: timeline)
@@ -331,7 +339,7 @@ extension TimelineSampleViewController {
 // MARK: - Helper
 extension TimelineSampleViewController {
 
-    private func loadVideoAsset(named: String, withExtension ext: String = "mp4") -> AVURLAsset? {
+    private func loadAsset(named: String, withExtension ext: String = "mp4") -> AVURLAsset? {
         guard let url = Bundle.main.url(forResource: named, withExtension: ext) else {
             return nil
         }

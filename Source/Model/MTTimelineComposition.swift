@@ -20,9 +20,12 @@ public struct MTTimelineCompositionResult {
 
     public let videoComposition: AVVideoComposition?
 
-    init(composition: AVComposition, videoComposition: AVVideoComposition?) {
+    public let audioMix: AVAudioMix?
+
+    init(composition: AVComposition, videoComposition: AVVideoComposition?, audioMix: AVAudioMix? = nil) {
         self.composition = composition
         self.videoComposition = videoComposition
+        self.audioMix = audioMix
     }
 
 }
@@ -47,7 +50,7 @@ public class MTTimelineComposition {
         let compositionResult = try buildComposition()
         let playerItem = AVPlayerItem(asset: compositionResult.composition)
         playerItem.videoComposition = compositionResult.videoComposition
-        //playerItem.audioMix = buildAudioMix()
+        playerItem.audioMix = compositionResult.audioMix
         return playerItem
     }
 
@@ -97,6 +100,8 @@ public class MTTimelineComposition {
 
         let composition = AVMutableComposition(urlAssetInitializationOptions: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
 
+        var audioMixInputParameters: [AVAudioMixInputParameters] = []
+
         try instruction
             .clipTrackInfos
             .forEach { trackInfo in
@@ -111,12 +116,36 @@ public class MTTimelineComposition {
                 case .audio:
                     let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
                     try composition.addResource(trackID: trackID, with: resourceInfo, at: time)
+                case .backgroundAudio:
+                    let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
+                    try composition.addResource(trackID: trackID, with: resourceInfo, at: time, duration: trackInfo.timeRange.duration)
+
+                    let endTime = time + trackInfo.timeRange.duration
+
+                    let track = composition.track(withTrackID: trackID)
+                    let inputParameter = AVMutableAudioMixInputParameters(track: track)
+
+                    let fadeDuration = CMTime(seconds: 1.5, preferredTimescale: 10000)
+                    let fadeInTimeRange = CMTimeRange(start: time, duration: fadeDuration)
+                    let fadeOutTimeRange = CMTimeRange(start: endTime - fadeDuration, duration: fadeDuration)
+                    inputParameter.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: fadeInTimeRange)
+                    inputParameter.setVolumeRamp(fromStartVolume: 1, toEndVolume: 0, timeRange: fadeOutTimeRange)
+                    audioMixInputParameters.append(inputParameter)
                 }
             }
 
         let videoComposition = buildVideoComposition(instruction: instruction, composition: composition)
 
-        return MTTimelineCompositionResult(composition: composition, videoComposition: videoComposition)
+        let audioMix = { () -> AVAudioMix? in
+            if audioMixInputParameters.isEmpty {
+                return nil
+            }
+            let audioMix = AVMutableAudioMix()
+            audioMix.inputParameters = audioMixInputParameters
+            return audioMix
+        }()
+
+        return MTTimelineCompositionResult(composition: composition, videoComposition: videoComposition, audioMix: audioMix)
     }
 
     private enum CompositorType {

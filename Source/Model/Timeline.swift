@@ -37,6 +37,7 @@ public class Timeline {
     public var renderSize: CGSize = CGSize(width: 960, height: 540)
     public var backgroundColor: CIColor = CIColor(red: 0, green: 0, blue: 0)
     public var clips: [Clip] = []
+    public var backgroundAudioClip: Clip? // This clip will only use audio track
     public var transitionProvider: TransitionProvider? = DefaultTransitionProvider()
 
     struct CompositionInstruction {
@@ -140,11 +141,13 @@ public class Timeline {
                 return Int32(trackIndex) + Int32((clipIndex % 2 + 1) * 100)
             case .audio:
                 return Int32(trackIndex) + Int32((clipIndex % 2 + 1) * 1000)
+            case .backgroundAudio:
+                return Int32(trackIndex) + 10
             }
         }
 
-        // - Track Info for clips
-        let clipTrackInfos: [TrackInfo] = zip(clips, clipTimeRanges)
+        // - Track Info for clips. Use `var` here for set up backgroundAudio later.
+        var clipTrackInfos: [TrackInfo] = zip(clips, clipTimeRanges)
             .enumerated()
             .flatMap { offset, info -> [TrackInfo] in
                 let (clip, timeRange) = info
@@ -200,6 +203,21 @@ public class Timeline {
                 return trackInfo
             }
 
+        // - Track Info for background audio
+        if let backgroundAudioClip = backgroundAudioClip {
+            let start = clipTimeRanges.first!.start
+            let end = clipTimeRanges.last!
+            let timeRange = CMTimeRange(start: .zero, duration: end.end)
+
+            for index in 0..<backgroundAudioClip.numberOfAudioTracks() {
+                let trackID = makeTrackID(trackIndex: index, clipIndex: 0, mediaType: .backgroundAudio)
+                let trackInfo = TrackInfo(
+                    clip: backgroundAudioClip, index: index, mediaType: .backgroundAudio, trackID: trackID, timeRange: timeRange
+                )
+                clipTrackInfos.append(trackInfo)
+            }
+        }
+
         return CompositionInstruction(
             clipTrackInfos: clipTrackInfos,
             passThroughTrackInfos: passthroughTrackInfos,
@@ -216,6 +234,7 @@ struct TrackInfo {
     enum MediaType {
         case video
         case audio
+        case backgroundAudio
     }
 
     let clip: Clip

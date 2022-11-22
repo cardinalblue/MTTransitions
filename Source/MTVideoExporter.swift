@@ -11,29 +11,36 @@ public typealias MTVideoExporterCompletion = (Error?) -> Void
 
 public class MTVideoExporter {
     
-    private let composition: AVMutableComposition
+    private let composition: AVComposition
     
-    private let videoComposition: AVMutableVideoComposition
+    private let videoComposition: AVVideoComposition?
     
+    private let audioMix: AVAudioMix?
+
     private let exportSession: AVAssetExportSession
     
     public convenience init(transitionResult: MTVideoTransitionResult, presetName: String = AVAssetExportPresetHighestQuality) throws {
         try self.init(composition: transitionResult.composition, videoComposition: transitionResult.videoComposition, presetName: presetName)
     }
     
-    public init(composition: AVMutableComposition,
-                videoComposition: AVMutableVideoComposition,
-                presetName: String = AVAssetExportPresetHighestQuality,
-                metadata: [AVMetadataItem]? = nil) throws {
-        self.composition = composition
-        self.videoComposition = videoComposition
-        guard let session = AVAssetExportSession(asset: composition, presetName: presetName) else {
-            fatalError("Can not create AVAssetExportSession, please check composition")
+    public init(
+        composition: AVComposition,
+        videoComposition: AVVideoComposition?,
+        audioMix: AVAudioMix? = nil,
+        presetName: String = AVAssetExportPresetHighestQuality,
+        metadata: [AVMetadataItem]? = nil
+    ) throws {
+            self.composition = composition
+            self.videoComposition = videoComposition
+            self.audioMix = audioMix
+            guard let session = AVAssetExportSession(asset: composition, presetName: presetName) else {
+                fatalError("Can not create AVAssetExportSession, please check composition")
+            }
+            self.exportSession = session
+            self.exportSession.videoComposition = videoComposition
+            self.exportSession.audioMix = audioMix
+            self.exportSession.metadata = metadata
         }
-        self.exportSession = session
-        self.exportSession.videoComposition = videoComposition
-        self.exportSession.metadata = metadata
-    }
     
     /// Export the composition to local file.
     /// - Parameters:
