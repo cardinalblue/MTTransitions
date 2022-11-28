@@ -189,10 +189,8 @@ class TimelineSampleViewController: UIViewController {
 //            Clip(resource: resource4)
         ]
         timeline.backgroundAudioClip = { () -> Clip in
-            let timeRange = CMTimeRange(start: .zero, duration: CMTime(seconds: 5, preferredTimescale: 1000))
             let audioResource = AVAssetResource(
-                asset: loadAsset(named: "audio1", withExtension: "mp3")!,
-                selectedTimeRange: timeRange
+                asset: loadAsset(named: "audio1_trimmed", withExtension: "mp3")!
             )
             return Clip(resource: audioResource)
         }()

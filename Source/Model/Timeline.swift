@@ -207,7 +207,7 @@ public class Timeline {
         if let backgroundAudioClip = backgroundAudioClip {
             let start = clipTimeRanges.first!.start
             let end = clipTimeRanges.last!
-            let timeRange = CMTimeRange(start: .zero, duration: end.end)
+            let timeRange = CMTimeRange(start: start, duration: end.end)
 
             for index in 0..<backgroundAudioClip.numberOfAudioTracks() {
                 let trackID = makeTrackID(trackIndex: index, clipIndex: 0, mediaType: .backgroundAudio)

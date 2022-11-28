@@ -118,9 +118,9 @@ public class MTTimelineComposition {
                     try composition.addResource(trackID: trackID, with: resourceInfo, at: time)
                 case .backgroundAudio:
                     let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
-                    try composition.addResource(trackID: trackID, with: resourceInfo, at: time, duration: trackInfo.timeRange.duration)
-
-                    let endTime = time + trackInfo.timeRange.duration
+                    let endTime = trackInfo.timeRange.end
+                    try composition.addResource(trackID: trackID, with: resourceInfo,
+                                                at: time, timeRange: resourceInfo.selectedTimeRange, until: endTime)
 
                     let track = composition.track(withTrackID: trackID)
                     let inputParameter = AVMutableAudioMixInputParameters(track: track)

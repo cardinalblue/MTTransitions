@@ -189,4 +189,24 @@ extension AVMutableComposition {
         try compositionTrack.insertTimeRange(selectedTimeRange, of: resourceTrackInfo.track, at: time)
     }
 
+    func addResource(trackID: Int32, with resourceTrackInfo: ResourceTrackInfo, at: CMTime, timeRange: CMTimeRange, until: CMTime) throws {
+        let assetTrack = resourceTrackInfo.track
+
+        let compositionTrack: AVMutableCompositionTrack? = {
+            if let track = track(withTrackID: trackID) {
+                return track
+            }
+            return addMutableTrack(withMediaType: assetTrack.mediaType, preferredTrackID: trackID)
+        }()
+
+        guard let compositionTrack = compositionTrack else {
+            throw MTTimelineCompositionError.noCompositionTrack
+        }
+
+        let times = CMTime.makeLoopTime(timeRange: timeRange, at: at, until: until)
+        for time in times {
+            print("at: \(time.at), range: \(time.timeRange)")
+            try compositionTrack.insertTimeRange(time.timeRange, of: resourceTrackInfo.track, at: time.at)
+        }
+    }
 }
