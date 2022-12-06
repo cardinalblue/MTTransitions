@@ -125,7 +125,7 @@ public class MTTimelineComposition {
                     let track = composition.track(withTrackID: trackID)
                     let inputParameter = AVMutableAudioMixInputParameters(track: track)
 
-                    let fadeDuration = CMTime(seconds: 1.5, preferredTimescale: 10000)
+                    let fadeDuration = CMTime(seconds: 1.5, preferredTimescale: 1000)
                     let fadeInTimeRange = CMTimeRange(start: time, duration: fadeDuration)
                     let fadeOutTimeRange = CMTimeRange(start: endTime - fadeDuration, duration: fadeDuration)
                     inputParameter.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: fadeInTimeRange)
