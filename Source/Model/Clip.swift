@@ -205,7 +205,6 @@ extension AVMutableComposition {
 
         let times = CMTime.makeLoopTime(timeRange: timeRange, at: at, until: until)
         for time in times {
-            print("at: \(time.at), range: \(time.timeRange)")
             try compositionTrack.insertTimeRange(time.timeRange, of: resourceTrackInfo.track, at: time.at)
         }
     }
