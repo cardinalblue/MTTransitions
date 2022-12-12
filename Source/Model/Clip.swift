@@ -80,6 +80,15 @@ public class Clip {
 
 extension Clip: VideoCompositionProvider {
 
+    @available(iOS 13.0.0, *)
+    public func prepare() async -> ResourceStatus {
+        await withCheckedContinuation { continuation in
+            prepare { status in
+                continuation.resume(returning: status)
+            }
+        }
+    }
+
     public func applyEffect(to sourceImage: CIImage, at time: CMTime, renderSize: CGSize) -> CIImage {
         var finalImage: CIImage = {
             let relativeTime = time - self.startTime

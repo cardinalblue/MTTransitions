@@ -56,33 +56,15 @@ public class MTTimelineComposition {
 
     // MARK: - Build Composition
 
-    public func prepare(completion: @escaping (Result<Void, Error>) -> Void) {
-        let group = DispatchGroup()
-        group.enter()
-
-        timeline.clips.forEach { clip in
-            group.enter()
-            clip.prepare { status in
-                group.leave()
-            }
+    public func prepare() async throws {
+        for clip in timeline.clips {
+            await clip.prepare()
         }
-
-        group.notify(queue: .main) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let unavailableClips = self.timeline.clips.filter { !$0.isReady }
-
-            if unavailableClips.isEmpty {
-                completion(.success(Void()))
-            } else {
-                let error = MTTimelineCompositionError.unavailable(clips: unavailableClips)
-                completion(.failure(error))
-            }
+        let unavailableClips = timeline.clips.filter { !$0.isReady }
+        if !unavailableClips.isEmpty {
+            let error = MTTimelineCompositionError.unavailable(clips: unavailableClips)
+            throw error
         }
-
-        group.leave()
     }
 
     @discardableResult
