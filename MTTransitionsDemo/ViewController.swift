@@ -45,6 +45,9 @@ class ViewController: UITableViewController {
         case 8:
             let vc = TimelineSampleViewController()
             navigationController?.pushViewController(vc, animated: true)
+        case 9:
+            let vc = DebugAnimationToolViewController()
+            navigationController?.pushViewController(vc, animated: true)
         default:
             break
         }

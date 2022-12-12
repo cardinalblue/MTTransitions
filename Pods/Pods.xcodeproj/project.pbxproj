@@ -2107,77 +2107,6 @@
 			};
 			name = Release;
 		};
-		26AC4A0C2A1FC7AA3C2DED7B5097EC2B /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2500B9F6290AE721FE1DAF6413039AF1 /* MTTransitions.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/MTTransitions/MTTransitions-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/MTTransitions/MTTransitions-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/MTTransitions/MTTransitions.modulemap";
-				PRODUCT_MODULE_NAME = MTTransitions;
-				PRODUCT_NAME = MTTransitions;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		398605202A0E1A5AF7C98AC5064F5D8B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8A416A8C62E4B1EF6AAE32933C5A5042 /* MTTransitions.debug.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/MTTransitions/MTTransitions-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/MTTransitions/MTTransitions-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MODULEMAP_FILE = "Target Support Files/MTTransitions/MTTransitions.modulemap";
-				PRODUCT_MODULE_NAME = MTTransitions;
-				PRODUCT_NAME = MTTransitions;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
 		3B9E27772F43D29FAC0421AD875C1090 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B1DDB54F95A41209339E928F7AB1A158 /* MetalPetal.debug.xcconfig */;
@@ -2415,6 +2344,77 @@
 			};
 			name = Debug;
 		};
+		EE71A85D15ADD2AA38AD299FF8D40D7E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8A416A8C62E4B1EF6AAE32933C5A5042 /* MTTransitions.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/MTTransitions/MTTransitions-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/MTTransitions/MTTransitions-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/MTTransitions/MTTransitions.modulemap";
+				PRODUCT_MODULE_NAME = MTTransitions;
+				PRODUCT_NAME = MTTransitions;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		F2E4D0CC68F2472B4A5526691E516D15 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2500B9F6290AE721FE1DAF6413039AF1 /* MTTransitions.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/MTTransitions/MTTransitions-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/MTTransitions/MTTransitions-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULEMAP_FILE = "Target Support Files/MTTransitions/MTTransitions.modulemap";
+				PRODUCT_MODULE_NAME = MTTransitions;
+				PRODUCT_NAME = MTTransitions;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2439,8 +2439,8 @@
 		A661329FBCD7250DF849E44DB4E01AB0 /* Build configuration list for PBXNativeTarget "MTTransitions" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				398605202A0E1A5AF7C98AC5064F5D8B /* Debug */,
-				26AC4A0C2A1FC7AA3C2DED7B5097EC2B /* Release */,
+				EE71A85D15ADD2AA38AD299FF8D40D7E /* Debug */,
+				F2E4D0CC68F2472B4A5526691E516D15 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
