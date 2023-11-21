@@ -40,6 +40,15 @@ public class Timeline {
     public var backgroundAudioClip: Clip? // This clip will only use audio track
     public var transitionProvider: TransitionProvider? = DefaultTransitionProvider()
 
+    public func calculateTotalDuration() throws -> TimeInterval {
+        let instruction = try build()
+        let clipTrackInfos = instruction.clipTrackInfos
+        guard clipTrackInfos.count > 0 else {
+            return 0
+        }
+        return clipTrackInfos.last!.timeRange.end.seconds
+    }
+
     struct CompositionInstruction {
         /// The available time ranges for the movie clips (video and audio).
         let clipTrackInfos: [TrackInfo]
