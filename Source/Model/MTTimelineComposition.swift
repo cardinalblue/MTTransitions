@@ -101,18 +101,25 @@ public class MTTimelineComposition {
                 case .backgroundAudio:
                     let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
                     let endTime = trackInfo.timeRange.end
-                    try composition.addResource(trackID: trackID, with: resourceInfo,
-                                                at: time, timeRange: resourceInfo.selectedTimeRange, until: endTime)
+                    try composition.addResource(
+                        trackID: trackID,
+                        with: resourceInfo,
+                        at: time,
+                        timeRange: resourceInfo.selectedTimeRange,
+                        until: endTime
+                    )
 
-                    let track = composition.track(withTrackID: trackID)
-                    let inputParameter = AVMutableAudioMixInputParameters(track: track)
-
-                    let fadeDuration = CMTime(seconds: 1.5, preferredTimescale: 1000)
-                    let fadeInTimeRange = CMTimeRange(start: time, duration: fadeDuration)
-                    let fadeOutTimeRange = CMTimeRange(start: endTime - fadeDuration, duration: fadeDuration)
-                    inputParameter.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: fadeInTimeRange)
-                    inputParameter.setVolumeRamp(fromStartVolume: 1, toEndVolume: 0, timeRange: fadeOutTimeRange)
-                    audioMixInputParameters.append(inputParameter)
+                    let duration = trackInfo.timeRange.duration.seconds
+                    if duration > 1.5 {
+                        let track = composition.track(withTrackID: trackID)
+                        let inputParameter = AVMutableAudioMixInputParameters(track: track)
+                        let fadeDuration = CMTime(seconds: min(duration / 2.0, 1.5), preferredTimescale: 1000)
+                        let fadeInTimeRange = CMTimeRange(start: time, duration: fadeDuration)
+                        let fadeOutTimeRange = CMTimeRange(start: endTime - fadeDuration, duration: fadeDuration)
+                        inputParameter.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: fadeInTimeRange)
+                        inputParameter.setVolumeRamp(fromStartVolume: 1, toEndVolume: 0, timeRange: fadeOutTimeRange)
+                        audioMixInputParameters.append(inputParameter)
+                    }
                 }
             }
 
