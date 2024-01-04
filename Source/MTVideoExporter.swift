@@ -9,6 +9,10 @@ import AVFoundation
 
 public typealias MTVideoExporterCompletion = (Error?) -> Void
 
+public enum MTVideoExporterError: String, Error {
+    case exportSessionCreationFailed
+}
+
 public class MTVideoExporter {
     
     private let composition: AVComposition
@@ -28,7 +32,8 @@ public class MTVideoExporter {
     ) throws {
         self.composition = composition
         guard let session = AVAssetExportSession(asset: composition, presetName: presetName) else {
-            fatalError("Can not create AVAssetExportSession, please check composition")
+            assertionFailure("Can not create AVAssetExportSession, please check composition")
+            throw MTVideoExporterError.exportSessionCreationFailed
         }
         self.exportSession = session
         self.exportSession.videoComposition = videoComposition
