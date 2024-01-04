@@ -80,6 +80,15 @@ public class Clip {
 
 extension Clip: VideoCompositionProvider {
 
+    @available(iOS 13.0.0, *)
+    public func prepare() async -> ResourceStatus {
+        await withCheckedContinuation { continuation in
+            prepare { status in
+                continuation.resume(returning: status)
+            }
+        }
+    }
+
     public func applyEffect(to sourceImage: CIImage, at time: CMTime, renderSize: CGSize) -> CIImage {
         var finalImage: CIImage = {
             let relativeTime = time - self.startTime
@@ -171,4 +180,41 @@ extension AVMutableComposition {
         }
     }
 
+    func addResource(trackID: Int32, with resourceTrackInfo: ResourceTrackInfo, at time: CMTime, duration: CMTime) throws {
+        let assetTrack = resourceTrackInfo.track
+
+        let compositionTrack: AVMutableCompositionTrack? = {
+            if let track = track(withTrackID: trackID) {
+                return track
+            }
+            return addMutableTrack(withMediaType: assetTrack.mediaType, preferredTrackID: trackID)
+        }()
+
+        guard let compositionTrack = compositionTrack else {
+            throw MTTimelineCompositionError.noCompositionTrack
+        }
+
+        let selectedTimeRange = CMTimeRange(start: time, duration: duration)
+        try compositionTrack.insertTimeRange(selectedTimeRange, of: resourceTrackInfo.track, at: time)
+    }
+
+    func addResource(trackID: Int32, with resourceTrackInfo: ResourceTrackInfo, at: CMTime, timeRange: CMTimeRange, until: CMTime) throws {
+        let assetTrack = resourceTrackInfo.track
+
+        let compositionTrack: AVMutableCompositionTrack? = {
+            if let track = track(withTrackID: trackID) {
+                return track
+            }
+            return addMutableTrack(withMediaType: assetTrack.mediaType, preferredTrackID: trackID)
+        }()
+
+        guard let compositionTrack = compositionTrack else {
+            throw MTTimelineCompositionError.noCompositionTrack
+        }
+
+        let times = CMTime.makeLoopTime(timeRange: timeRange, at: at, until: until)
+        for time in times {
+            try compositionTrack.insertTimeRange(time.timeRange, of: resourceTrackInfo.track, at: time.at)
+        }
+    }
 }

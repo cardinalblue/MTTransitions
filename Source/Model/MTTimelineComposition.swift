@@ -20,9 +20,12 @@ public struct MTTimelineCompositionResult {
 
     public let videoComposition: AVVideoComposition?
 
-    init(composition: AVComposition, videoComposition: AVVideoComposition?) {
+    public let audioMix: AVAudioMix?
+
+    init(composition: AVComposition, videoComposition: AVVideoComposition?, audioMix: AVAudioMix? = nil) {
         self.composition = composition
         self.videoComposition = videoComposition
+        self.audioMix = audioMix
     }
 
 }
@@ -47,39 +50,21 @@ public class MTTimelineComposition {
         let compositionResult = try buildComposition()
         let playerItem = AVPlayerItem(asset: compositionResult.composition)
         playerItem.videoComposition = compositionResult.videoComposition
-        //playerItem.audioMix = buildAudioMix()
+        playerItem.audioMix = compositionResult.audioMix
         return playerItem
     }
 
     // MARK: - Build Composition
 
-    public func prepare(completion: @escaping (Result<Void, Error>) -> Void) {
-        let group = DispatchGroup()
-        group.enter()
-
-        timeline.clips.forEach { clip in
-            group.enter()
-            clip.prepare { status in
-                group.leave()
-            }
+    public func prepare() async throws {
+        for clip in timeline.clips {
+            await clip.prepare()
         }
-
-        group.notify(queue: .main) { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            let unavailableClips = self.timeline.clips.filter { !$0.isReady }
-
-            if unavailableClips.isEmpty {
-                completion(.success(Void()))
-            } else {
-                let error = MTTimelineCompositionError.unavailable(clips: unavailableClips)
-                completion(.failure(error))
-            }
+        let unavailableClips = timeline.clips.filter { !$0.isReady }
+        if !unavailableClips.isEmpty {
+            let error = MTTimelineCompositionError.unavailable(clips: unavailableClips)
+            throw error
         }
-
-        group.leave()
     }
 
     @discardableResult
@@ -97,6 +82,8 @@ public class MTTimelineComposition {
 
         let composition = AVMutableComposition(urlAssetInitializationOptions: [AVURLAssetPreferPreciseDurationAndTimingKey: true])
 
+        var audioMixInputParameters: [AVAudioMixInputParameters] = []
+
         try instruction
             .clipTrackInfos
             .forEach { trackInfo in
@@ -111,12 +98,43 @@ public class MTTimelineComposition {
                 case .audio:
                     let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
                     try composition.addResource(trackID: trackID, with: resourceInfo, at: time)
+                case .backgroundAudio:
+                    let resourceInfo = clip.resource.trackInfo(for: .audio, at: trackInfo.index)
+                    let endTime = trackInfo.timeRange.end
+                    try composition.addResource(
+                        trackID: trackID,
+                        with: resourceInfo,
+                        at: time,
+                        timeRange: resourceInfo.selectedTimeRange,
+                        until: endTime
+                    )
+
+                    let duration = trackInfo.timeRange.duration.seconds
+                    if duration > 1.5 {
+                        let track = composition.track(withTrackID: trackID)
+                        let inputParameter = AVMutableAudioMixInputParameters(track: track)
+                        let fadeDuration = CMTime(seconds: min(duration / 2.0, 1.5), preferredTimescale: 1000)
+                        let fadeInTimeRange = CMTimeRange(start: time, duration: fadeDuration)
+                        let fadeOutTimeRange = CMTimeRange(start: endTime - fadeDuration, duration: fadeDuration)
+                        inputParameter.setVolumeRamp(fromStartVolume: 0, toEndVolume: 1, timeRange: fadeInTimeRange)
+                        inputParameter.setVolumeRamp(fromStartVolume: 1, toEndVolume: 0, timeRange: fadeOutTimeRange)
+                        audioMixInputParameters.append(inputParameter)
+                    }
                 }
             }
 
         let videoComposition = buildVideoComposition(instruction: instruction, composition: composition)
 
-        return MTTimelineCompositionResult(composition: composition, videoComposition: videoComposition)
+        let audioMix = { () -> AVAudioMix? in
+            if audioMixInputParameters.isEmpty {
+                return nil
+            }
+            let audioMix = AVMutableAudioMix()
+            audioMix.inputParameters = audioMixInputParameters
+            return audioMix
+        }()
+
+        return MTTimelineCompositionResult(composition: composition, videoComposition: videoComposition, audioMix: audioMix)
     }
 
     private enum CompositorType {

@@ -47,6 +47,7 @@
 		A3F2636A243EF67B00A093D2 /* PickImageTransitionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F26369243EF67B00A093D2 /* PickImageTransitionViewController.swift */; };
 		FBB33DD328461993006FA36F /* TimelineSampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB33DD228461993006FA36F /* TimelineSampleViewController.swift */; };
 		FBD7D02D2847486500E62822 /* APLCompositionDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */; };
+		FBE7123C29348D6500BC77FB /* audio1_trimmed.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +97,7 @@
 		FBD7D02A2847486400E62822 /* MTTransitionsDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MTTransitionsDemo-Bridging-Header.h"; sourceTree = "<group>"; };
 		FBD7D02B2847486500E62822 /* APLCompositionDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLCompositionDebugView.h; sourceTree = "<group>"; };
 		FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLCompositionDebugView.m; sourceTree = "<group>"; };
+		FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio1_trimmed.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +156,7 @@
 			children = (
 				A3C9E22024373E4D002F82D9 /* audio1.mp3 */,
 				A3C9E1F42431D640002F82D9 /* audio2.mp3 */,
+				FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */,
 				A369F7DC242A035C00546190 /* cut1.mp4 */,
 				A369F7DD242A035C00546190 /* cut2.mp4 */,
 				A3CFA84A242B96E900F2E660 /* cut3.mp4 */,
@@ -293,6 +296,7 @@
 				A3E0AD2D2205BEA6002DD092 /* 5.jpg in Resources */,
 				A3E0AD282205BEA6002DD092 /* 8.jpg in Resources */,
 				A3913EC3242886280083E7D3 /* clip1.mp4 in Resources */,
+				FBE7123C29348D6500BC77FB /* audio1_trimmed.mp3 in Resources */,
 				A3E0AD2F2205BEA6002DD092 /* 6.jpg in Resources */,
 				A3E0AD272205BEA6002DD092 /* 3.jpg in Resources */,
 				A374124121F98D9B0019F3A3 /* LaunchScreen.storyboard in Resources */,
@@ -491,7 +495,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -546,7 +550,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -565,7 +569,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = F6J8B455GU;
 				INFOPLIST_FILE = "$(SRCROOT)/MTTransitionsDemo/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -589,7 +593,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = F6J8B455GU;
 				INFOPLIST_FILE = "$(SRCROOT)/MTTransitionsDemo/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

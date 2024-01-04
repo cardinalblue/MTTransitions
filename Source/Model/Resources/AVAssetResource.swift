@@ -43,44 +43,24 @@ public class AVAssetResource: Resource {
             return nil
         case .unavailable:
             let asset = self.asset
-            asset.loadValuesAsynchronously(forKeys: ["tracks", "duration"], completionHandler: { [weak self] in
-                guard let self = self else { return }
-
-                func finished() {
-                    if asset.tracks.count > 0 {
-                        if let track = asset.tracks(withMediaType: .video).first {
-                            self.size = track.naturalSize.applying(track.preferredTransform)
-                        }
-                        self.status = .available
-                        self.duration = asset.duration
+            Task {
+                if #available(iOS 16, *) {
+                    do {
+                        _ = try await asset.load(.tracks)
+                    } catch {
+                        debugPrint("load asset tracks with error: \(error)")
                     }
-                    DispatchQueue.main.async {
-                        completion(self.status)
-                    }
+                } else {
+                    await asset.loadValues(forKeys: ["tracks"])
                 }
-
-                var error: NSError?
-                let tracksStatus = asset.statusOfValue(forKey: "tracks", error: &error)
-                if tracksStatus != .loaded {
-                    self.status = .unavailable(error)
-                    debugPrint("Failed to load tracks, status: \(tracksStatus), error: \(String(describing: error))")
-                    finished()
-                    return
+                if let track = asset.tracks(withMediaType: .video).first {
+                    self.size = track.naturalSize.applying(track.preferredTransform)
                 }
-
-                let durationStatus = asset.statusOfValue(forKey: "duration", error: &error)
-                if durationStatus != .loaded {
-                    self.status = .unavailable(error);
-                    debugPrint("Failed to duration tracks, status: \(tracksStatus), error: \(String(describing: error))")
-                    finished()
-                    return
-                }
-                finished()
-            })
-
-            return ResourceTask(cancel: {
+                completion(.available)
+            }
+            return ResourceTask {
                 asset.cancelLoading()
-            })
+            }
         }
     }
 
