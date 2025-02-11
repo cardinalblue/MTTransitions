@@ -40,7 +40,7 @@ public class MTVideoTransitionRenderer: NSObject {
 }
 
 extension UIImage {
-    public convenience init?(pixelBuffer: CVPixelBuffer) {
+    convenience init?(pixelBuffer: CVPixelBuffer) {
         var cgImage: CGImage?
         VTCreateCGImageFromCVPixelBuffer(pixelBuffer, options: nil, imageOut: &cgImage)
         guard let image = cgImage else {
@@ -49,7 +49,7 @@ extension UIImage {
         self.init(cgImage: image)
     }
 
-    public convenience init(color: UIColor, size: CGSize) {
+    convenience init(color: UIColor, size: CGSize) {
         UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
         let context = UIGraphicsGetCurrentContext()!
 
