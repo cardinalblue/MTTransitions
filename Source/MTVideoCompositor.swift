@@ -62,7 +62,7 @@ class MTVideoCompositor: NSObject, AVVideoCompositing {
     }
     
     func startRequest(_ asyncVideoCompositionRequest: AVAsynchronousVideoCompositionRequest) {
-        print("composition time \(asyncVideoCompositionRequest.compositionTime)")
+//        print("composition time \(asyncVideoCompositionRequest.compositionTime)")
         autoreleasepool {
             renderingQueue.async {
                 // Check if all pending requests have been cancelled.
