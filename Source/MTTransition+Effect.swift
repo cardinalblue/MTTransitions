@@ -2,7 +2,7 @@
 //  MTTransition+Effect.swift
 //  MTTransitions
 //
-//  Created by xushuifeng on 2020/3/22.
+//  Created by alexiscn on 2020/3/22.
 //
 
 import Foundation
@@ -18,6 +18,7 @@ extension MTTransition {
         /// none transition applied
         case none
         case angular
+        case bookFlip
         case bounce
         case bowTieHorizontal
         case bowTieVertical
@@ -40,6 +41,7 @@ extension MTTransition {
         case directionalWarp
         case directionalWipe
         case displacement
+        case dissolve
         case doomScreen
         case doorway
         case dreamy
@@ -47,6 +49,8 @@ extension MTTransition {
         case fadegrayscale
         case fade
         case flyeye
+        case fadeInWipeUp
+        case fadeInWipeLeft
         case glitchDisplace
         case glitchMemories
         case gridFlip
@@ -56,12 +60,15 @@ extension MTTransition {
         case kaleidoScope
         case leftRight
         case linearBlur
+        case lissajousTiles
         case luma
         case luminanceMelt
         case morph
         case mosaic
+        case mosaicYueDev
         case multiplyBlend
         case overexposure
+        case parametricGlitch
         case perlin
         case pinwheel
         case pixelize
@@ -78,6 +85,8 @@ extension MTTransition {
         case simpleZoom
         case squaresWire
         case squeeze
+        case starWipe
+        case staticFade
         case stereoViewer
         case swap
         case swirl
@@ -99,6 +108,7 @@ extension MTTransition {
             switch self {
             case .none: return MTNoneTransition()
             case .angular: return MTAngularTransition()
+            case .bookFlip: return MTBookFlipTransition()
             case .bounce: return MTBounceTransition()
             case .bowTieHorizontal: return MTBowTieHorizontalTransition()
             case .bowTieVertical: return MTBowTieVerticalTransition()
@@ -121,6 +131,7 @@ extension MTTransition {
             case .directionalWarp: return MTDirectionalWarpTransition()
             case .directionalWipe: return MTDirectionalWipeTransition()
             case .displacement: return MTDisplacementTransition()
+            case .dissolve: return MTDissolveTransition()
             case .doomScreen: return MTDoomScreenTransition()
             case .doorway: return MTDoorwayTransition()
             case .dreamy: return MTDreamyTransition()
@@ -128,6 +139,8 @@ extension MTTransition {
             case .fadegrayscale: return MTFadegrayscaleTransition()
             case .fade: return MTFadeTransition()
             case .flyeye: return MTFlyeyeTransition()
+            case .fadeInWipeUp: return MTFadeInWipeUpTransition()
+            case .fadeInWipeLeft: return MTFadeInWipeLeftTransition()
             case .glitchDisplace: return MTGlitchDisplaceTransition()
             case .glitchMemories: return MTGlitchMemoriesTransition()
             case .gridFlip: return MTGridFlipTransition()
@@ -137,12 +150,15 @@ extension MTTransition {
             case .kaleidoScope: return MTKaleidoScopeTransition()
             case .leftRight: return MTLeftRightTransition()
             case .linearBlur: return MTLinearBlurTransition()
+            case .lissajousTiles: return MTLissajousTilesTransition()
             case .luma: return MTLumaTransition()
             case .luminanceMelt: return MTLuminanceMeltTransition()
             case .morph: return MTMorphTransition()
             case .mosaic: return MTMosaicTransition()
+            case .mosaicYueDev: return MTMosaicYueDevTransition()
             case .multiplyBlend: return MTMultiplyBlendTransition()
             case .overexposure: return MTOverexposureTransition()
+            case .parametricGlitch: return MTParametricGlitchTransition()
             case .perlin: return MTPerlinTransition()
             case .pinwheel: return MTPinwheelTransition()
             case .pixelize: return MTPixelizeTransition()
@@ -159,6 +175,8 @@ extension MTTransition {
             case .simpleZoom: return MTSimpleZoomTransition()
             case .squaresWire: return MTSquaresWireTransition()
             case .squeeze: return MTSqueezeTransition()
+            case .starWipe: return MTStarWipeTransition()
+            case .staticFade: return MTStaticFadeTransition()
             case .stereoViewer: return MTStereoViewerTransition()
             case .swap: return MTSwapTransition()
             case .swirl: return MTSwirlTransition()
@@ -182,6 +200,7 @@ extension MTTransition {
             switch self {
             case .none: return "None"
             case .angular: return "Angular"
+            case .bookFlip: return "BookFlip"
             case .bounce: return "Bounce"
             case .bowTieHorizontal: return "BowTieHorizontal"
             case .bowTieVertical: return "BowTieVertical"
@@ -204,6 +223,7 @@ extension MTTransition {
             case .directionalWarp: return "DirectionalWarp"
             case .directionalWipe: return "DirectionalWipe"
             case .displacement: return "Displacement"
+            case .dissolve: return "Dissolve"
             case .doomScreen: return "DoomScreen"
             case .doorway: return "Doorway"
             case .dreamy: return "Dreamy"
@@ -211,6 +231,8 @@ extension MTTransition {
             case .fadegrayscale: return "Fadegrayscale"
             case .fade: return "Fade"
             case .flyeye: return "Flyeye"
+            case .fadeInWipeUp: return "FadeInWipeUp"
+            case .fadeInWipeLeft: return "FadeInWipeLeft"
             case .glitchDisplace: return "GlitchDisplace"
             case .glitchMemories: return "GlitchMemories"
             case .gridFlip: return "GridFlip"
@@ -220,12 +242,15 @@ extension MTTransition {
             case .kaleidoScope: return "KaleidoScope"
             case .leftRight: return "LeftRight"
             case .linearBlur: return "LinearBlur"
+            case .lissajousTiles: return "LissajousTiles"
             case .luma: return "Luma"
             case .luminanceMelt: return "LuminanceMelt"
             case .morph: return "Morph"
             case .mosaic: return "Mosaic"
+            case .mosaicYueDev: return "MosaicYueDev"
             case .multiplyBlend: return "MultiplyBlend"
             case .overexposure: return "Overexposure"
+            case .parametricGlitch: return "ParametricGlitch"
             case .perlin: return "Perlin"
             case .pinwheel: return "Pinwheel"
             case .pixelize: return "Pixelize"
@@ -242,6 +267,8 @@ extension MTTransition {
             case .simpleZoom: return "SimpleZoom"
             case .squaresWire: return "SquaresWire"
             case .squeeze: return "Squeeze"
+            case .starWipe: return "StarWipe"
+            case .staticFade: return "StaticFade"
             case .stereoViewer: return "StereoViewer"
             case .swap: return "Swap"
             case .swirl: return "Swirl"
