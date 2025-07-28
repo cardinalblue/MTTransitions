@@ -63,21 +63,18 @@ public class ResourceTask {
 }
 
 private extension AVAsset {
-
     private class Dummy {}
 
     static let empty: AVAsset? = {
+        #if SWIFT_PACKAGE
+        let bundle = Bundle.module
+        #else
         let bundle = Bundle(for: AVAsset.Dummy.self)
+        #endif
 
-        // For SPM
-        if let videoURL = bundle.url(forResource: "black_empty", withExtension: "mp4") {
-            return AVAsset(url: videoURL)
-        }
-
-        // For CocoaPods
-        if let bundleURL = bundle.resourceURL?.appendingPathComponent("Assets.bundle") {
-            let resourceBundle = Bundle.init(url: bundleURL)
-            if let videoURL = resourceBundle?.url(forResource: "black_empty", withExtension: "mp4") {
+        if let bundleUrl = bundle.url(forResource: "Assets", withExtension: "bundle"),
+           let resourceBundle = Bundle(url: bundleUrl) {
+            if let videoURL = resourceBundle.url(forResource: "black_empty", withExtension: "mp4") {
                 return AVAsset(url: videoURL)
             }
         }
