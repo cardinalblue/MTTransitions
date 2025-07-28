@@ -46,11 +46,7 @@ public class ImageResource: Resource {
 
     public func trackInfo(for type: AVMediaType, at index: Int) -> ResourceTrackInfo {
         let track = tracks(for: type)[index]
-        let emptyDuration = CMTime(seconds: 1, preferredTimescale: 30)
-        let emptyTimeRange = CMTimeRangeMake(start: CMTime.zero, duration: emptyDuration)
-        return ResourceTrackInfo(track: track,
-                                 selectedTimeRange: selectedTimeRange,
-                                 scaleToDuration: duration)
+        return ResourceTrackInfo(track: track, selectedTimeRange: selectedTimeRange, scaleToDuration: duration)
     }
 
     public func prepare(progressHandler: ((Double) -> Void)?, completion: @escaping (ResourceStatus) -> Void) -> ResourceTask? {
