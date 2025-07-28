@@ -20,12 +20,12 @@ open class MTTimelineVideoCompositor: NSObject, AVFoundation.AVVideoCompositing 
     private var shouldCancelAllRequests = false
     private var renderContext: AVVideoCompositionRenderContext?
 
-    public var sourcePixelBufferAttributes: [String : Any]? =
+    public var sourcePixelBufferAttributes: [String : any Sendable]? =
         [String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_420YpCbCr8BiPlanarFullRange,
          String(kCVPixelBufferOpenGLESCompatibilityKey): true,
          String(kCVPixelBufferMetalCompatibilityKey): true]
 
-    public var requiredPixelBufferAttributesForRenderContext: [String : Any] =
+    public var requiredPixelBufferAttributesForRenderContext: [String : any Sendable] =
         [String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA,
          String(kCVPixelBufferOpenGLESCompatibilityKey): true,
          String(kCVPixelBufferMetalCompatibilityKey): true]

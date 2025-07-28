@@ -13,11 +13,11 @@ class MTVideoCompositor: NSObject, AVVideoCompositing {
     public static var ciContext: CIContext = CIContext()
 
     /// Returns the pixel buffer attributes required by the video compositor for new buffers created for processing.
-    var requiredPixelBufferAttributesForRenderContext: [String : Any] =
+    var requiredPixelBufferAttributesForRenderContext: [String : any Sendable] =
     [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
     
     /// The pixel buffer attributes of pixel buffers that will be vended by the adaptor’s CVPixelBufferPool.
-    var sourcePixelBufferAttributes: [String : Any]? =
+    var sourcePixelBufferAttributes: [String : any Sendable]? =
     [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
     
     /// Set if all pending requests have been cancelled.
