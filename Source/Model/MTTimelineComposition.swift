@@ -212,11 +212,3 @@ public class MTTimelineComposition {
         return videoComposition
     }
 }
-
-extension CMTimeRange: CustomStringConvertible {
-
-    public var description: String {
-        String(format: "start: %.2fs, duration: %.2fs", start.seconds, duration.seconds)
-    }
-    
-}
