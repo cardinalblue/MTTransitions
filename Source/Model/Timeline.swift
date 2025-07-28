@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreImage
 import CoreMedia
 
 public protocol TransitionProvider {

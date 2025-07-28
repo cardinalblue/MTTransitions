@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreImage
 import AVFoundation
 
 class MTVideoCompositionInstruction: NSObject, AVVideoCompositionInstructionProtocol {

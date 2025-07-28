@@ -5,6 +5,7 @@
 //  Created by alexiscn on 2020/3/23.
 //
 
+import CoreImage
 import AVFoundation
 
 class MTVideoCompositor: NSObject, AVVideoCompositing {

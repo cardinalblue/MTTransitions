@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import CoreImage
 import Foundation
 
 public protocol VideoCompositionProvider: AnyObject {

@@ -6,6 +6,7 @@
 //
 
 import CoreMedia
+import CoreImage
 import Foundation
 
 public struct VideoPostProcessingInfo {

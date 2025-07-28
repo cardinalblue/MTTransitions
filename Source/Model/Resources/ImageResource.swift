@@ -7,6 +7,7 @@
 
 import AVFoundation
 import CoreMedia
+import CoreImage
 import Foundation
 
 public class ImageResource: Resource {
