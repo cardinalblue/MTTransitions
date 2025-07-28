@@ -59,7 +59,7 @@ public class MTTransition: NSObject, MTIUnaryFilter {
         params["ratio"] = Float(input.size.width / input.size.height)
         params["progress"] = progress
         
-        let output = kernel.apply(toInputImages: images, parameters: params, outputDescriptors: outputDescriptors).first
+        let output = kernel.apply(to: images, parameters: params, outputDescriptors: outputDescriptors).first
         return output
     }
     

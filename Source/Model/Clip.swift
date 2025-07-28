@@ -81,7 +81,7 @@ public class Clip {
 
 extension Clip: VideoCompositionProvider {
 
-    @available(iOS 13.0.0, *)
+    @discardableResult
     public func prepare() async -> ResourceStatus {
         await withCheckedContinuation { continuation in
             prepare { status in

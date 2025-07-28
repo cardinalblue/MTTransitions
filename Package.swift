@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "MTTransitions",
-    platforms: [.iOS(.v11)],
+    platforms: [.iOS(.v13)],
     products: [.library(name: "MTTransitions",
                         targets: ["MTTransitions"]),
     ],
