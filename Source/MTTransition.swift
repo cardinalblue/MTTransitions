@@ -58,20 +58,56 @@ public class MTTransition: NSObject, MTIUnaryFilter {
         var params = parameters
         params["ratio"] = Float(input.size.width / input.size.height)
         params["progress"] = progress
-        
+
         let output = kernel.apply(to: images, parameters: params, outputDescriptors: outputDescriptors).first
         return output
     }
     
     var kernel: MTIRenderPipelineKernel {
         let vertexDescriptor = MTIFunctionDescriptor(name: MTIFilterPassthroughVertexFunctionName)
-        let fragmentDescriptor = MTIFunctionDescriptor(name: fragmentName, libraryURL: MTIDefaultLibraryURLForBundle(Bundle(for: MTTransition.self)))
+        let fragmentDescriptor = MTIFunctionDescriptor(name: fragmentName, libraryURL: libraryURL)
         let kernel = MTIRenderPipelineKernel(vertexFunctionDescriptor: vertexDescriptor, fragmentFunctionDescriptor: fragmentDescriptor)
         return kernel
     }
     
-    private func samplerImage(name: String) -> MTIImage? {
+    /// Determines the appropriate Metal library URL based on build environment
+    private var libraryURL: URL? {
+        // For SPM builds, try to load precompiled metallib from Bundle.module
+        #if SWIFT_PACKAGE
+        if let metallibURL = Bundle.module.url(
+            forResource: metallibFileName,
+            withExtension: "metallib",
+            subdirectory: "Shaders"
+        ) {
+            return metallibURL
+        } else {
+            assertionFailure("Could not find precompiled metallib for \(metallibFileName)")
+            return nil
+        }
+        #else
+        // Use the standard bundle approach
         let bundle = Bundle(for: MTTransition.self)
+        return MTIDefaultLibraryURLForBundle(bundle)
+        #endif
+    }
+    
+    /// Generates the metallib filename based on the fragment name
+    private var metallibFileName: String {
+        // Convert fragment function name to metallib filename
+        // e.g., "AngularFragment" -> "MTAngularTransition"
+        if fragmentName.hasSuffix("Fragment") {
+            let baseName = String(fragmentName.dropLast(8)) // Remove "Fragment"
+            return "MT\(baseName)Transition"
+        }
+        return fragmentName
+    }
+    
+    private func samplerImage(name: String) -> MTIImage? {
+        #if SWIFT_PACKAGE
+        let bundle = Bundle.module
+        #else
+        let bundle = Bundle(for: MTTransition.self)
+        #endif
         guard let bundleUrl = bundle.url(forResource: "Assets", withExtension: "bundle"),
             let resourceBundle = Bundle(url: bundleUrl) else {
             return nil
