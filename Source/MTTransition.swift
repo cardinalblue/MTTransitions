@@ -74,18 +74,21 @@ public class MTTransition: NSObject, MTIUnaryFilter {
     private var libraryURL: URL? {
         // For SPM builds, try to load precompiled metallib from Bundle.module
         #if SWIFT_PACKAGE
-        if let metallibURL = Bundle.module.url(forResource: metallibFileName, withExtension: "metallib", subdirectory: "Shaders"),
-           FileManager.default.fileExists(atPath: metallibURL.path) {
+        if let metallibURL = Bundle.module.url(
+            forResource: metallibFileName,
+            withExtension: "metallib",
+            subdirectory: "Shaders"
+        ) {
             return metallibURL
+        } else {
+            assertionFailure("Could not find precompiled metallib for \(metallibFileName)")
+            return nil
         }
         #else
-        // For CocoaPods builds, use the standard bundle approach
+        // Use the standard bundle approach
         let bundle = Bundle(for: MTTransition.self)
         return MTIDefaultLibraryURLForBundle(bundle)
         #endif
-
-        // Final fallback
-        return MTIDefaultLibraryURLForBundle(Bundle(for: MTTransition.self))
     }
     
     /// Generates the metallib filename based on the fragment name
@@ -100,7 +103,11 @@ public class MTTransition: NSObject, MTIUnaryFilter {
     }
     
     private func samplerImage(name: String) -> MTIImage? {
+        #if SWIFT_PACKAGE
         let bundle = Bundle.module
+        #else
+        let bundle = Bundle(for: MTTransition.self)
+        #endif
         guard let bundleUrl = bundle.url(forResource: "Assets", withExtension: "bundle"),
             let resourceBundle = Bundle(url: bundleUrl) else {
             return nil
