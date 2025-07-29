@@ -28,7 +28,10 @@ public enum MTVideoTransitionError: Error {
 }
 
 public class MTVideoTransition: NSObject {
-    
+
+    /// The video render size. It will use first asset's naturalSize if the value is not given
+    public var renderSize: CGSize?
+
     /// The duration of the transition.
     private var transitionDuration: CMTime = .invalid
     
@@ -108,7 +111,7 @@ public class MTVideoTransition: NSObject {
         transitionTimeRanges = Array(repeating: timeRange, count: clips.count)
         
         let videoTracks = self.clips[0].tracks(withMediaType: .video)
-        let videoSize = videoTracks[0].naturalSize
+        let videoSize = renderSize ?? videoTracks[0].naturalSize
         
         let composition = AVMutableComposition()
         composition.naturalSize = videoSize
@@ -199,7 +202,7 @@ public class MTVideoTransition: NSObject {
         var alternatingIndex = 0
         var nextClipStartTime = CMTime.zero
         
-        for index in 0 ..< clipsCount {
+        for index in 0..<clipsCount {
             alternatingIndex = index % 2
             let asset = clips[index]
             var timeRangeInAsset: CMTimeRange
@@ -270,7 +273,10 @@ public class MTVideoTransition: NSObject {
             if videoComposition.customVideoCompositorClass != nil {
                 let trackID = compositionVideoTracks[alternatingIndex].trackID
                 let timeRange = passThroughTimeRanges[index]
-                let videoInstruction = MTVideoCompositionInstruction(thePassthroughTrackID: trackID, forTimeRange: timeRange)
+                let videoInstruction = MTVideoCompositionInstruction(sourceTrackID: trackID, forTimeRange: timeRange)
+                videoInstruction.foregroundTrackID = trackID
+                videoInstruction.configuration = VideoConfiguration()
+//                let videoInstruction = MTVideoCompositionInstruction(thePassthroughTrackID: trackID, forTimeRange: timeRange)
                 instructions.append(videoInstruction)
             } else {
                 // Pass through clip i.

@@ -45,6 +45,9 @@
 		A3E0AD2E2205BEA6002DD092 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A3E0AD252205BEA6002DD092 /* 2.jpg */; };
 		A3E0AD2F2205BEA6002DD092 /* 6.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A3E0AD262205BEA6002DD092 /* 6.jpg */; };
 		A3F2636A243EF67B00A093D2 /* PickImageTransitionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F26369243EF67B00A093D2 /* PickImageTransitionViewController.swift */; };
+		FBB33DD328461993006FA36F /* TimelineSampleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB33DD228461993006FA36F /* TimelineSampleViewController.swift */; };
+		FBD7D02D2847486500E62822 /* APLCompositionDebugView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */; };
+		FBE7123C29348D6500BC77FB /* audio1_trimmed.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -90,6 +93,11 @@
 		A3F26369243EF67B00A093D2 /* PickImageTransitionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickImageTransitionViewController.swift; sourceTree = "<group>"; };
 		B836BB87FE171E542E923255 /* Pods-MTTransitionsDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MTTransitionsDemo.debug.xcconfig"; path = "Target Support Files/Pods-MTTransitionsDemo/Pods-MTTransitionsDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		DFFA7AD2345E40333C6D8F8D /* Pods-MTTransitionsDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MTTransitionsDemo.release.xcconfig"; path = "Target Support Files/Pods-MTTransitionsDemo/Pods-MTTransitionsDemo.release.xcconfig"; sourceTree = "<group>"; };
+		FBB33DD228461993006FA36F /* TimelineSampleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSampleViewController.swift; sourceTree = "<group>"; };
+		FBD7D02A2847486400E62822 /* MTTransitionsDemo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MTTransitionsDemo-Bridging-Header.h"; sourceTree = "<group>"; };
+		FBD7D02B2847486500E62822 /* APLCompositionDebugView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APLCompositionDebugView.h; sourceTree = "<group>"; };
+		FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APLCompositionDebugView.m; sourceTree = "<group>"; };
+		FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = audio1_trimmed.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +156,7 @@
 			children = (
 				A3C9E22024373E4D002F82D9 /* audio1.mp3 */,
 				A3C9E1F42431D640002F82D9 /* audio2.mp3 */,
+				FBE7123B29348D6500BC77FB /* audio1_trimmed.mp3 */,
 				A369F7DC242A035C00546190 /* cut1.mp4 */,
 				A369F7DD242A035C00546190 /* cut2.mp4 */,
 				A3CFA84A242B96E900F2E660 /* cut3.mp4 */,
@@ -192,9 +201,13 @@
 				A3913E90242646580083E7D3 /* PresentBViewController.swift */,
 				A3913E94242648150083E7D3 /* WallpaperViewController.swift */,
 				A3913EA9242761A30083E7D3 /* VideoTransitionSampleViewController.swift */,
+				FBB33DD228461993006FA36F /* TimelineSampleViewController.swift */,
 				A3CFA848242B94A000F2E660 /* MultipleVideoTransitionsViewController.swift */,
 				A3913ED32428DE620083E7D3 /* TransitionsPickerViewController.swift */,
 				A3CFA846242B7A2300F2E660 /* CreateVideoFromImagesViewController.swift */,
+				FBD7D02B2847486500E62822 /* APLCompositionDebugView.h */,
+				FBD7D02C2847486500E62822 /* APLCompositionDebugView.m */,
+				FBD7D02A2847486400E62822 /* MTTransitionsDemo-Bridging-Header.h */,
 			);
 			path = Samples;
 			sourceTree = "<group>";
@@ -252,7 +265,7 @@
 				TargetAttributes = {
 					A374123221F98D9A0019F3A3 = {
 						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1130;
+						LastSwiftMigration = 1320;
 					};
 				};
 			};
@@ -283,6 +296,7 @@
 				A3E0AD2D2205BEA6002DD092 /* 5.jpg in Resources */,
 				A3E0AD282205BEA6002DD092 /* 8.jpg in Resources */,
 				A3913EC3242886280083E7D3 /* clip1.mp4 in Resources */,
+				FBE7123C29348D6500BC77FB /* audio1_trimmed.mp3 in Resources */,
 				A3E0AD2F2205BEA6002DD092 /* 6.jpg in Resources */,
 				A3E0AD272205BEA6002DD092 /* 3.jpg in Resources */,
 				A374124121F98D9B0019F3A3 /* LaunchScreen.storyboard in Resources */,
@@ -397,10 +411,12 @@
 				A374123921F98D9A0019F3A3 /* ViewController.swift in Sources */,
 				A374123721F98D9A0019F3A3 /* AppDelegate.swift in Sources */,
 				A3913E822425C5FE0083E7D3 /* ImageTransitionSampleViewController.swift in Sources */,
+				FBB33DD328461993006FA36F /* TimelineSampleViewController.swift in Sources */,
 				A3913E89242627890083E7D3 /* PushBViewController.swift in Sources */,
 				A32F8A6B22041F5D009C03AD /* GIFGenerator.swift in Sources */,
 				A3913EAA242761A30083E7D3 /* VideoTransitionSampleViewController.swift in Sources */,
 				A3913E95242648150083E7D3 /* WallpaperViewController.swift in Sources */,
+				FBD7D02D2847486500E62822 /* APLCompositionDebugView.m in Sources */,
 				A3913E872426277E0083E7D3 /* PushAViewController.swift in Sources */,
 				A3913ED42428DE620083E7D3 /* TransitionsPickerViewController.swift in Sources */,
 			);
@@ -479,7 +495,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -534,7 +550,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -549,16 +565,20 @@
 			baseConfigurationReference = B836BB87FE171E542E923255 /* Pods-MTTransitionsDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LX863G777H;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = F6J8B455GU;
 				INFOPLIST_FILE = "$(SRCROOT)/MTTransitionsDemo/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.shuifeng.MTTransitionsDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTTransitionsDemo/Samples/MTTransitionsDemo-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -569,16 +589,19 @@
 			baseConfigurationReference = DFFA7AD2345E40333C6D8F8D /* Pods-MTTransitionsDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LX863G777H;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = F6J8B455GU;
 				INFOPLIST_FILE = "$(SRCROOT)/MTTransitionsDemo/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = me.shuifeng.MTTransitionsDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
+				SWIFT_OBJC_BRIDGING_HEADER = "MTTransitionsDemo/Samples/MTTransitionsDemo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -59,8 +59,9 @@ class VideoTransitionSampleViewController: UIViewController {
         let url = Bundle.main.url(forResource: "clip1", withExtension: "mp4")!
         player = AVPlayer(url: url)
         playerLayer = AVPlayerLayer(player: player)
-        playerLayer.videoGravity = .resizeAspectFill
+        playerLayer.videoGravity = .resizeAspect
         videoView.layer.addSublayer(playerLayer)
+        videoView.backgroundColor = UIColor.green
         
         nameLabel = UILabel()
         nameLabel.text = effect.description
@@ -84,6 +85,8 @@ class VideoTransitionSampleViewController: UIViewController {
         ])
         
         pickButton.addTarget(self, action: #selector(handlePickButtonClicked), for: .touchUpInside)
+
+        setupSizeButtons()
     }
 
     private func setupVideoPlaybacks() {
@@ -100,8 +103,55 @@ class VideoTransitionSampleViewController: UIViewController {
         
         navigationItem.rightBarButtonItem = exportButton
     }
+
+    private func setupSizeButtons() {
+        let hStack: UIStackView = {
+            let stack = UIStackView()
+            stack.axis = .horizontal
+            stack.spacing = 8
+            stack.alignment = .fill
+            stack.distribution = .equalSpacing
+            return stack
+        }()
+
+        let portrait = UIButton(type: .custom)
+        portrait.setTitle("9:16", for: .normal)
+        portrait.tag = 0
+        portrait.addTarget(self, action: #selector(handleChangeSize(_:)), for: .touchUpInside)
+
+        let square = UIButton(type: .custom)
+        square.setTitle("1:1", for: .normal)
+        square.tag = 1
+        square.addTarget(self, action: #selector(handleChangeSize(_:)), for: .touchUpInside)
+
+        let landscape = UIButton(type: .custom)
+        landscape.setTitle("16:9", for: .normal)
+        landscape.tag = 2
+        landscape.addTarget(self, action: #selector(handleChangeSize(_:)), for: .touchUpInside)
+
+        [portrait, square, landscape].forEach { button in
+            button.backgroundColor = UIColor.gray
+            button.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                button.widthAnchor.constraint(equalToConstant: 60)
+            ])
+            hStack.addArrangedSubview(button)
+        }
+
+        view.addSubview(hStack)
+        hStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            hStack.topAnchor.constraint(equalTo: pickButton.bottomAnchor, constant: 30),
+            hStack.leadingAnchor.constraint(equalTo: hStack.arrangedSubviews.first!.leadingAnchor),
+            hStack.trailingAnchor.constraint(equalTo: hStack.arrangedSubviews.last!.trailingAnchor),
+            hStack.heightAnchor.constraint(equalToConstant: 60)
+        ])
+    }
     
-    private func makeTransition() {
+    private func makeTransition(renderSize: CGSize? = CGSize(width: 720, height: 720)) {
+        videoTransition.renderSize = renderSize
+
         let duration = CMTimeMakeWithSeconds(2.0, preferredTimescale: 1000)
         try? videoTransition.merge(clips, effect: effect, transitionDuration: duration) { [weak self] result in
             guard let self = self else { return }
@@ -194,6 +244,27 @@ extension VideoTransitionSampleViewController {
         }
         let nav = UINavigationController(rootViewController: pickerVC)
         present(nav, animated: true, completion: nil)
+    }
+
+    @objc private func handleChangeSize(_ sender: UIButton) {
+        let newRenderSize = { () -> CGSize in
+            let dimension: Int = 720
+            switch sender.tag {
+            case 0: // Portrait
+                return CGSize(width: dimension, height:  Int(CGFloat(dimension) * 16.0 / 9.0))
+            case 1: // Square
+                return CGSize(width: dimension, height: dimension)
+            case 2: // Landscape
+                return CGSize(width: Int(CGFloat(dimension) * 16.0 / 9.0), height: dimension)
+            default:
+                assertionFailure("unexpected value")
+                return .zero
+            }
+        }()
+        guard videoTransition.renderSize != newRenderSize else {
+            return
+        }
+        makeTransition(renderSize: newRenderSize)
     }
 }
 
