@@ -110,6 +110,9 @@ let package = Package(
                 "Transitions/MTZoomInCirclesTransition.metal"
             ],
             resources: [
+                // Copy pre-compiled .metallib files and exclude .metal files.
+                // Some .metal files contain #include "MTIShaderLib.h", which prevents us from using `.process`.
+                // Therefore, we precompile them instead.
                 .copy("Resources/Shaders"),
                 .copy("Assets.bundle")
             ]
